@@ -1,0 +1,25 @@
+{
+    "name": "nwidart/jsgrid",
+    "description": "",
+    "authors": [
+        {
+            "name": "Boris Blondin",
+            "email": "blondin.boris@gmail.com"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Modules\\JsGrid\\Providers\\JsGridServiceProvider"
+            ],
+            "aliases": {
+                
+            }
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\JsGrid\\": ""
+        }
+    }
+}
