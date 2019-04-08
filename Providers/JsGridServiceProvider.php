@@ -66,18 +66,38 @@ class JsGridServiceProvider extends ServiceProvider
      *
      * @return void
      */
+    // public function registerViews()
+    // {
+    //     $themePaths = $this->app->make('view.finder')->getThemesPublishPaths('jsgrid');
+
+    //     $sourcePath = __DIR__.'/../Resources/views';
+
+    //     foreach($themePaths as $path => $namespace){
+    //         $this->publishes([
+    //             $sourcePath => $path
+    //         ],$namespace);
+    //     }
+        
+    //     $this->loadViewsFrom(array_merge(array_map(function ($path) {
+    //         return $path . '/modules/jsgrid';
+    //     }, \Config::get('view.paths')), [$sourcePath]), 'jsgrid');
+    // }
+    
+    /**
+     * Register views.
+     *
+     * @return void
+     */
     public function registerViews()
     {
-        $themePaths = $this->app->make('view.finder')->getThemesPublishPaths('jsgrid');
+        $viewPath = resource_path('views/modules/jsgrid');
 
         $sourcePath = __DIR__.'/../Resources/views';
 
-        foreach($themePaths as $path => $namespace){
-            $this->publishes([
-                $sourcePath => $path
-            ],$namespace);
-        }
-        
+        $this->publishes([
+            $sourcePath => $viewPath
+        ],'views');
+
         $this->loadViewsFrom(array_merge(array_map(function ($path) {
             return $path . '/modules/jsgrid';
         }, \Config::get('view.paths')), [$sourcePath]), 'jsgrid');

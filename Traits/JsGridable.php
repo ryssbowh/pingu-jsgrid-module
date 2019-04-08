@@ -2,6 +2,8 @@
 namespace Modules\JsGrid\Traits;
 
 use Modules\Forms\Components\Fields\Number;
+use Modules\Forms\Components\Fields\Text;
+use Modules\JsGrid\Components\Text as JsGridText;
 use Modules\JsGrid\Events\JsGridFieldsBuilt;
 use Modules\JsGrid\Events\JsGridOptionsBuilt;
 
@@ -14,7 +16,7 @@ trait JsGridable {
 	 */
     public static function jsGridFields()
     {
-        return [];
+        return $this->fillable;
     }
 
     /**
@@ -78,22 +80,23 @@ trait JsGridable {
 		}
 
 		foreach($jsGridFields as $name => $jsgridOptions){
+			if(!isset($fieldsDef[$name])) continue;
+			if(!isset($jsGridFields[$name]['type'])) $jsGridFields[$name]['type'] = JsGridText::class;
+
 			$options = $fieldsDef[$name];
-			$field = new $options['type']($name, $options['options']??[]);
-			$field = array_merge(['type' => $field->getType(), 'name' => $field->getName()], $field->getOptions(), $jsgridOptions);
-			$field['title'] = $field['label'];
-			unset($field['label']);
-			$fields[$name] = $field;
+			$field = new $options['type']($name, $fieldsDef[$name]);
+			$jsGridField = new $jsGridFields[$name]['type']($jsGridFields[$name], $field);
+
+			$fields[$name] = $jsGridField->getOptions();
 		}
 
 		if($controls){
+			if(!isset($controls['type'])) $controls['type'] = 'control';
 			$fields['_controls'] = $controls;
 		}
 
 		event(new JsGridFieldsBuilt($name, $fields));
 
-		$fields = json_encode(array_values($fields));
-
-		return $fields;
+		return json_encode(array_values($fields));
 ;	}
 }

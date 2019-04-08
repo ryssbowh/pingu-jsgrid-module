@@ -1,5 +1,7 @@
 import jsGrid from 'jsgrid';
-import JsGridFields from './JsGrid-fields.js';
+import DatetimeField from './fields/datetime.js';
+import SelectField from './fields/select.js';
+import ModelField from './fields/model.js';
 
 const JsGrid = (() => {
 
@@ -9,8 +11,13 @@ const JsGrid = (() => {
 
 	function init(){ 
 		console.log('JsGrid initialized');
+
 		if(options.jsgrid.length){
-			JsGridFields.init();
+
+			SelectField.init();
+			DatetimeField.init();
+			ModelField.init();
+
 			initJsGrid();
 		}
 	};
@@ -34,26 +41,41 @@ const JsGrid = (() => {
 	        	}).done(function(data){
 		        	$('.jsgrid-total').html(data.total);
 		        	$('.jsgrid-total').parent().show();
+	        	}).fail(function(data){
+	        		showErrors(data.responseJSON.errors);
 	        	});
 			},
 			updateItem: function(item){
+				console.log(item);
 				return $.ajax({
 			        type: "PUT",
 			        url: jsOptions.ajaxUrl,
 			        data: item,
-		       	});
+		       	}).fail(function(data){
+	        		showErrors(data.responseJSON.errors);
+	        	});
 			},
 			deleteItem: function(item){
 				return $.ajax({
 			        type: "DELETE",
 			        url: jsOptions.ajaxUrl,
 			        data: {id:item.id},
-		       	});
+		       	}).fail(function(data){
+	        		showErrors(data.responseJSON.errors);
+	        	});
 			}
 		};
 
 		options.jsgrid.jsGrid(jsOptions);
 	};
+
+	function showErrors(errors){
+		var text = "";
+		$.each(errors, function(item){
+			text += errors[item] + "\n";
+		});
+		alert(text);
+	}
 
 	return {
 		init: init

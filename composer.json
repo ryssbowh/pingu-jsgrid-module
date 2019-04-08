@@ -1,6 +1,7 @@
 {
-    "name": "nwidart/jsgrid",
+    "name": "eskimo/jsgrid",
     "description": "",
+    "type" : "asgard-module",
     "authors": [
         {
             "name": "Boris Blondin",
