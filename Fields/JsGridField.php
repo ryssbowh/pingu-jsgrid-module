@@ -1,7 +1,7 @@
 <?php
-namespace Modules\JsGrid\Components;
+namespace Modules\JsGrid\Fields;
 
-use Modules\Forms\Components\Fields\Field;
+use Modules\Forms\Fields\Field;
 
 abstract class JsGridField
 {

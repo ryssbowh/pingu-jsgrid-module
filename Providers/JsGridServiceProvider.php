@@ -24,9 +24,9 @@ class JsGridServiceProvider extends ServiceProvider
     {
         $this->registerTranslations();
         $this->registerConfig();
-        $this->registerViews();
         $this->registerFactories();
         $this->registerAssets();
+        $this->loadViewsFrom(base_path('Modules/JsGrid/Resources/views'), 'jsgrid');
         $this->loadMigrationsFrom(__DIR__ . '/../Database/Migrations');
     }
 
@@ -59,48 +59,6 @@ class JsGridServiceProvider extends ServiceProvider
     {
         Asset::container('modules')->add('jsgrid-js', 'modules/JsGrid/js/JsGrid.js');
         Asset::container('modules')->add('jsgrid-css', 'modules/JsGrid/css/JsGrid.css');
-    }
-
-    /**
-     * Register views.
-     *
-     * @return void
-     */
-    // public function registerViews()
-    // {
-    //     $themePaths = $this->app->make('view.finder')->getThemesPublishPaths('jsgrid');
-
-    //     $sourcePath = __DIR__.'/../Resources/views';
-
-    //     foreach($themePaths as $path => $namespace){
-    //         $this->publishes([
-    //             $sourcePath => $path
-    //         ],$namespace);
-    //     }
-        
-    //     $this->loadViewsFrom(array_merge(array_map(function ($path) {
-    //         return $path . '/modules/jsgrid';
-    //     }, \Config::get('view.paths')), [$sourcePath]), 'jsgrid');
-    // }
-    
-    /**
-     * Register views.
-     *
-     * @return void
-     */
-    public function registerViews()
-    {
-        $viewPath = resource_path('views/modules/jsgrid');
-
-        $sourcePath = __DIR__.'/../Resources/views';
-
-        $this->publishes([
-            $sourcePath => $viewPath
-        ],'views');
-
-        $this->loadViewsFrom(array_merge(array_map(function ($path) {
-            return $path . '/modules/jsgrid';
-        }, \Config::get('view.paths')), [$sourcePath]), 'jsgrid');
     }
 
     /**

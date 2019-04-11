@@ -1,9 +1,9 @@
 <?php 
 namespace Modules\JsGrid\Traits;
 
-use Modules\Forms\Components\Fields\Number;
-use Modules\Forms\Components\Fields\Text;
-use Modules\JsGrid\Components\Text as JsGridText;
+use Modules\Forms\Fields\Number;
+use Modules\Forms\Fields\Text;
+use Modules\JsGrid\Fields\Text as JsGridText;
 use Modules\JsGrid\Events\JsGridFieldsBuilt;
 use Modules\JsGrid\Events\JsGridOptionsBuilt;
 

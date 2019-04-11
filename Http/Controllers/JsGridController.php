@@ -5,7 +5,7 @@ namespace Modules\JsGrid\Http\Controllers;
 use Illuminate\Http\Request;
 use ContextualLinks,Notify;
 use Modules\Core\Entities\BaseModel;
-use Modules\Forms\Components\Form;
+use Modules\Forms\Form;
 
 trait JsGridController
 {

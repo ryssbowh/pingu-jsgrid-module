@@ -1,5 +1,5 @@
 <?php
-namespace Modules\JsGrid\Components;
+namespace Modules\JsGrid\Fields;
 
 class Text extends JsGridField
 {
