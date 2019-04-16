@@ -98,5 +98,5 @@ trait JsGridable {
 		event(new JsGridFieldsBuilt($name, $fields));
 
 		return json_encode(array_values($fields));
-;	}
+	}
 }

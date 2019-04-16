@@ -21,12 +21,13 @@ const SelectField = (() => {
 
 		    this.sorter = this.valueType;
 
-		    NumberField.call(this, config);
+		    NumberField.call(this, config); 
 		}
 
 		field.prototype = new NumberField({
 
 		    valueType: numberValueType,
+		    align: 'left',
 
 		    itemTemplate: function(value) {
 		        var items = this.items,

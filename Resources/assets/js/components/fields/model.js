@@ -13,13 +13,10 @@ const ModelField = (() => {
 
         field.prototype = new SelectField({
 
-            align: 'left',
-
-            inArray: function(value, values){
-                var valueField = this.valueField;
+            inItems: function(id){
                 var found = false;
-                $.each(values, function(index, item){
-                    if(item[valueField] == value){
+                $.each(this.items, function(index, item){
+                    if(typeof item[id] != 'undefined'){
                         found = true;
                         return;
                     }
@@ -54,22 +51,22 @@ const ModelField = (() => {
             itemTemplate: function(value) {
                 var items = this.items,
                     valueField = this.valueField,
+                    textField = this.textField,
                     me = this,
+                    separator = this.separator,
                     result;
 
-                var test = $.grep({id:1, name:'truc'}, function(item, index){
-                    return true;
-                });
-
                 if(this.multiple) {
-                    // console.log('multiple');
-                    result = $.grep(items, function(item, index) {
-                        // console.log(item,index);
-                        return me.inArray(item[valueField], value);
+                    result = $.grep(value, function(item) {
+                        return me.inItems(item[valueField]);
                     });
                     if(result.length > 0){
                         result = result.map(function(item){
-                            return item.label;
+                            var fields = [];
+                            textField.forEach(function(field){
+                                fields.push(item[field]);
+                            });
+                            return fields.join(separator);
                         });
                         return result.join('<br/>');
                     }

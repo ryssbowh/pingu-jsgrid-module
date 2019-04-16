@@ -14,7 +14,7 @@ abstract class JsGridField
 		$this->type = strtolower(classname($this));
 		$this->options['type'] = strtolower(classname($this));
 		$this->options = array_merge($field->getOptions(), $this->options);
-		if(!isset($this->options['title'])) $this->options['title'] = $this->options['label'];
+		if(!isset($this->options['title'])) $this->options['title'] = $this->options['label'] ?? ucfirst($this->name);
 		unset($this->options['label']);
 	}
 
