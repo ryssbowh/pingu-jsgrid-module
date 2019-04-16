@@ -56,6 +56,10 @@ const SelectField = (() => {
 		        var grid = this._grid,
 		            $result = this.filterControl = this._createSelect();
 
+		        $result.prepend('<option value="">All</option>');
+                $result.prop('multiple', false);
+                $result.prop('selectedIndex',0);
+
 		        if(this.autosearch) {
 		            $result.on("change", function(e) {
 		                grid.search();
