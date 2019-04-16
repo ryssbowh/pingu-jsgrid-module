@@ -104,12 +104,12 @@ const ModelField = (() => {
             _createSelect: function() {
                 var $result = $("<select>");
 
-                $.each(this.items, function(index, item) {
+                for(var property in this.items){
                     var $option = $("<option>")
-                        .attr("value", item.id)
-                        .text(item.label)
+                        .attr("value", property)
+                        .text(this.items[property])
                         .appendTo($result);
-                });
+                }
 
                 if(this.selectedIndex == -1){ this.selectedIndex = 0;}
 
