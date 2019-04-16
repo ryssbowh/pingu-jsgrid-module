@@ -70,16 +70,17 @@ const ModelField = (() => {
                         });
                         return result.join('<br/>');
                     }
-                    else{
-                        result = '';
-                    }
                 }
                 else {
-                    result = $.grep(items, function(item, index) {
-                        return index == value[valueField];
-                    });
-                    return (result.length > 0) ? result[0] : '';
+                    if(value){
+                        var fields = [];
+                        textField.forEach(function(field){
+                            fields.push(value[field]);
+                        });
+                        return fields.join(separator);
+                    }
                 }
+                return '';
             },
 
             editTemplate: function(value) {
