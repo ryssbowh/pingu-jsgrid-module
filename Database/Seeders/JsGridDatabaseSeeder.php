@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\JsGrid\Database\Seeders;
+namespace Modules\Jsgrid\Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Database\Eloquent\Model;

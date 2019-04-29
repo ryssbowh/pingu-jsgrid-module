@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\JsGrid\Events;
+namespace Modules\Jsgrid\Events;
 
 use Illuminate\Queue\SerializesModels;
 

@@ -1,5 +1,5 @@
 <?php
-namespace Modules\JsGrid\Fields;
+namespace Modules\Jsgrid\Fields;
 
 class Select extends JsGridField
 {

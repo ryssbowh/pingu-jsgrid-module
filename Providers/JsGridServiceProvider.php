@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\JsGrid\Providers;
+namespace Modules\Jsgrid\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Eloquent\Factory;
@@ -26,7 +26,7 @@ class JsGridServiceProvider extends ServiceProvider
         $this->registerConfig();
         $this->registerFactories();
         $this->registerAssets();
-        $this->loadViewsFrom(base_path('Modules/JsGrid/Resources/views'), 'jsgrid');
+        $this->loadViewsFrom(base_path('Modules/Jsgrid/Resources/views'), 'jsgrid');
         $this->loadMigrationsFrom(__DIR__ . '/../Database/Migrations');
     }
 
@@ -57,8 +57,8 @@ class JsGridServiceProvider extends ServiceProvider
 
     public function registerAssets()
     {
-        Asset::container('modules')->add('jsgrid-js', 'modules/JsGrid/js/JsGrid.js');
-        Asset::container('modules')->add('jsgrid-css', 'modules/JsGrid/css/JsGrid.css');
+        Asset::container('modules')->add('jsgrid-js', 'modules/Jsgrid/js/Jsgrid.js');
+        Asset::container('modules')->add('jsgrid-css', 'modules/Jsgrid/css/Jsgrid.css');
     }
 
     /**

@@ -1,5 +1,5 @@
 <?php 
-namespace Modules\JsGrid\Contracts;
+namespace Modules\Jsgrid\Contracts;
 
 use Modules\Core\Contracts\APIableModelContract;
 use Modules\Forms\Contracts\FormableContract;

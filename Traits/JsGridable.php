@@ -1,11 +1,11 @@
 <?php 
-namespace Modules\JsGrid\Traits;
+namespace Modules\Jsgrid\Traits;
 
 use Modules\Forms\Fields\Number;
 use Modules\Forms\Fields\Text;
-use Modules\JsGrid\Fields\Text as JsGridText;
-use Modules\JsGrid\Events\JsGridFieldsBuilt;
-use Modules\JsGrid\Events\JsGridOptionsBuilt;
+use Modules\Jsgrid\Fields\Text as JsGridText;
+use Modules\Jsgrid\Events\JsGridFieldsBuilt;
+use Modules\Jsgrid\Events\JsGridOptionsBuilt;
 
 trait JsGridable {
 

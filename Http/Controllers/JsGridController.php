@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\JsGrid\Http\Controllers;
+namespace Modules\Jsgrid\Http\Controllers;
 
 use Illuminate\Http\Request;
 use ContextualLinks,Notify;

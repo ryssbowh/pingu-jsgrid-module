@@ -1,4 +1,4 @@
 <?php
-namespace Modules\JsGrid\Exceptions;
+namespace Modules\Jsgrid\Exceptions;
 
 class JsGridException extends \Exception{}
