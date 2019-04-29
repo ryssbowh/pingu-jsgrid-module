@@ -97,6 +97,6 @@ trait JsGridController
 
 		$options = $this->buildJsGridView($model, $request);
 
-		return view('pages.jsGridList')->with($options);
+		return view('jsgrid::list')->with($options);
 	}
 }
