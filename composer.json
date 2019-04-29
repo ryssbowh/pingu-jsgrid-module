@@ -1,6 +1,6 @@
 {
-    "name": "eskimo/jsgrid",
-    "description": "",
+    "name": "pingu/jsgrid-module",
+    "description": "JsGrid module for pingu",
     "type" : "asgard-module",
     "authors": [
         {
