@@ -16,7 +16,7 @@ trait JsGridable {
 	 */
     public static function jsGridFields()
     {
-        return $this->fillable;
+        return [];
     }
 
     /**
