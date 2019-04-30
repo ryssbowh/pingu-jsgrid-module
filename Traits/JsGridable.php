@@ -46,7 +46,7 @@ trait JsGridable {
 	 */
 	public static function buildJsGridOptions()
 	{
-		$options = config("core.jsGridDefaults");
+		$options = config("jsgrid.jsGridDefaults");
 		$name = self::jsGridInstanceName();
 		event(new JsGridOptionsBuilt($name, $options));
 		return $options;
