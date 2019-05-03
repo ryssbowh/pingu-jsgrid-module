@@ -1,0 +1,26 @@
+{
+    "name": "pingu/jsgrid-module",
+    "description": "JsGrid module for pingu",
+    "type" : "asgard-module",
+    "authors": [
+        {
+            "name": "Boris Blondin",
+            "email": "blondin.boris@gmail.com"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Modules\\Jsgrid\\Providers\\JsGridServiceProvider"
+            ],
+            "aliases": {
+                
+            }
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\Jsgrid\\": ""
+        }
+    }
+}
