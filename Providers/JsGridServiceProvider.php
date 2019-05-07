@@ -26,7 +26,7 @@ class JsGridServiceProvider extends ServiceProvider
         $this->registerConfig();
         $this->registerFactories();
         $this->registerAssets();
-        $this->loadViewsFrom(base_path('Pingu/Jsgrid/Resources/views'), 'jsgrid');
+        $this->loadViewsFrom(__DIR__ . '/../Resources/views', 'jsgrid');
         $this->loadMigrationsFrom(__DIR__ . '/../Database/Migrations');
     }
 

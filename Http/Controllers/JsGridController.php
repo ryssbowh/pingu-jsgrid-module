@@ -81,7 +81,7 @@ trait JsGridController
 		$contextualLink = $contextualLinks[$contextualLink];
 		ContextualLinks::addLinks($contextualLinks);
 		$options = $this->buildRelatedJsGridView($model, $request, $contextualLink);
-		return view('pages.jsGridList')->with($options);
+		return view('jsgrid::list')->with($options);
 	}
 
 	/**
