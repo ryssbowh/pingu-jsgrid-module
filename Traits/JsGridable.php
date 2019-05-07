@@ -1,11 +1,11 @@
 <?php 
-namespace Modules\Jsgrid\Traits;
+namespace Pingu\Jsgrid\Traits;
 
-use Modules\Forms\Fields\Number;
-use Modules\Forms\Fields\Text;
-use Modules\Jsgrid\Fields\Text as JsGridText;
-use Modules\Jsgrid\Events\JsGridFieldsBuilt;
-use Modules\Jsgrid\Events\JsGridOptionsBuilt;
+use Pingu\Forms\Fields\Number;
+use Pingu\Forms\Fields\Text;
+use Pingu\Jsgrid\Fields\Text as JsGridText;
+use Pingu\Jsgrid\Events\JsGridFieldsBuilt;
+use Pingu\Jsgrid\Events\JsGridOptionsBuilt;
 
 trait JsGridable {
 

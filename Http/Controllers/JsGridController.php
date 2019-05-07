@@ -1,11 +1,11 @@
 <?php
 
-namespace Modules\Jsgrid\Http\Controllers;
+namespace Pingu\Jsgrid\Http\Controllers;
 
 use Illuminate\Http\Request;
 use ContextualLinks,Notify;
-use Modules\Core\Entities\BaseModel;
-use Modules\Forms\Form;
+use Pingu\Core\Entities\BaseModel;
+use Pingu\Forms\Form;
 
 trait JsGridController
 {

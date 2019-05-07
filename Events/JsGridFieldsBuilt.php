@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Jsgrid\Events;
+namespace Pingu\Jsgrid\Events;
 
 use Illuminate\Queue\SerializesModels;
 

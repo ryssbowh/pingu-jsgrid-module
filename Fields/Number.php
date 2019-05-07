@@ -1,5 +1,5 @@
 <?php
-namespace Modules\Jsgrid\Fields;
+namespace Pingu\Jsgrid\Fields;
 
 class Number extends JsGridField
 {

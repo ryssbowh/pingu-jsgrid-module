@@ -1,4 +1,4 @@
 <?php
-namespace Modules\Jsgrid\Exceptions;
+namespace Pingu\Jsgrid\Exceptions;
 
 class JsGridException extends \Exception{}

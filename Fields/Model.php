@@ -1,7 +1,7 @@
 <?php
-namespace Modules\Jsgrid\Fields;
+namespace Pingu\Jsgrid\Fields;
 
-use Modules\Forms\Fields\Field;
+use Pingu\Forms\Fields\Field;
 
 class Model extends JsGridField
 {

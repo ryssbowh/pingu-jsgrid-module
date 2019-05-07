@@ -1,8 +1,8 @@
 <?php 
-namespace Modules\Jsgrid\Contracts;
+namespace Pingu\Jsgrid\Contracts;
 
-use Modules\Core\Contracts\APIableModelContract;
-use Modules\Forms\Contracts\FormableContract;
+use Pingu\Core\Contracts\APIableModelContract;
+use Pingu\Forms\Contracts\FormableContract;
 
 interface JsGridableContract extends APIableModelContract, FormableContract {
 

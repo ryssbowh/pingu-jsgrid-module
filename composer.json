@@ -11,7 +11,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Modules\\Jsgrid\\Providers\\JsGridServiceProvider"
+                "Pingu\\Jsgrid\\Providers\\JsGridServiceProvider"
             ],
             "aliases": {
                 
@@ -20,7 +20,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Modules\\Jsgrid\\": ""
+            "Pingu\\Jsgrid\\": ""
         }
     }
 }

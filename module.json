@@ -6,7 +6,7 @@
     "active": 1,
     "order": 0,
     "providers": [
-        "Modules\\Jsgrid\\Providers\\JsGridServiceProvider"
+        "Pingu\\Jsgrid\\Providers\\JsGridServiceProvider"
     ],
     "aliases": {},
     "files": [

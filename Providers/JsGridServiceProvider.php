@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Jsgrid\Providers;
+namespace Pingu\Jsgrid\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Eloquent\Factory;
@@ -26,7 +26,7 @@ class JsGridServiceProvider extends ServiceProvider
         $this->registerConfig();
         $this->registerFactories();
         $this->registerAssets();
-        $this->loadViewsFrom(base_path('Modules/Jsgrid/Resources/views'), 'jsgrid');
+        $this->loadViewsFrom(base_path('Pingu/Jsgrid/Resources/views'), 'jsgrid');
         $this->loadMigrationsFrom(__DIR__ . '/../Database/Migrations');
     }
 
