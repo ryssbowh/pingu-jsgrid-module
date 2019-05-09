@@ -1,10 +1,11 @@
 <?php 
 namespace Pingu\Jsgrid\Contracts;
 
-use Pingu\Core\Contracts\APIableModelContract;
-use Pingu\Forms\Contracts\FormableContract;
+use Pingu\Core\Contracts\APIableModel;
+use Pingu\Forms\Contracts\FormableModel;
 
-interface JsGridableContract extends APIableModelContract, FormableContract {
+interface JsGridableModel extends APIableModel, FormableModel
+{
 
 	/**
 	 * List of fields displayed in jsGrid

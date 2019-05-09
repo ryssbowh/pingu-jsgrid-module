@@ -22,5 +22,9 @@
         "psr-4": {
             "Pingu\\Jsgrid\\": ""
         }
+    },
+    "require":{
+        "pingu/core-module": "1.1.*",
+        "pingu/forms-module": "1.1.*"
     }
 }

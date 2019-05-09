@@ -1,22 +1,23 @@
 <?php
 
-namespace Pingu\Jsgrid\Http\Controllers;
+namespace Pingu\Jsgrid\Traits;
 
-use Illuminate\Http\Request;
 use ContextualLinks,Notify;
+use Illuminate\Http\Request;
 use Pingu\Core\Entities\BaseModel;
 use Pingu\Forms\Form;
+use Pingu\Jsgrid\Contracts\JsGridableModel;
 
 trait JsGridController
 {
 	/**
 	 * builds jsGrid options for a related jsGrid list view.
-	 * @param  string    $model
+	 * @param  JsGridableModel    $model
 	 * @param  Request   $request
 	 * @param  array|null     $contextualLink
 	 * @return array
 	 */
-	protected function buildRelatedJsGridView(BaseModel $model, Request $request, ?array $contextualLink = null)
+	public function buildRelatedJsGridView(JsGridableModel $model, Request $request, ?array $contextualLink = null)
 	{
 		$extraOptions = [
 			'relatedModel' => get_class($model),
@@ -43,13 +44,12 @@ trait JsGridController
 
 	/**
 	 * builds jsGrid options for a jsGrid list view.
-	 * @param  string    $model
 	 * @param  Request   $request
-	 * @param  array|null     $contextualLink
 	 * @return array
 	 */
-	protected function buildJsGridView(string $model, Request $request, ?array $contextualLink = null)
+	public function buildJsGridView(Request $request)
 	{
+		$model = $this->getModel();
 		$title = str_plural($model::friendlyName());
 		$options = $model::buildJsGridOptions();
 		$options['ajaxUrl'] = $model::apiUrl();
@@ -68,10 +68,10 @@ trait JsGridController
 	/**
 	 * Builds a jsGrid for a related object
 	 * @param  Request   $request
-	 * @param  BaseModel $model
+	 * @param  JsGridableModel $model
 	 * @return view
 	 */
-	public function relatedJsGridList(Request $request, BaseModel $model)
+	public function relatedJsGridList(Request $request, JsGridableModel $model)
 	{
 		if(!isset($request->route()->action['contextualLink'])) throw new Exception('contextualLink is not set for that route');
 		$contextualLink = $request->route()->action['contextualLink'];
@@ -93,9 +93,7 @@ trait JsGridController
 	 */
 	public function jsGridList(Request $request)
 	{
-		$model = $this->checkIfRouteHasModel($request);
-
-		$options = $this->buildJsGridView($model, $request);
+		$options = $this->buildJsGridView($request);
 
 		return view('jsgrid::list')->with($options);
 	}

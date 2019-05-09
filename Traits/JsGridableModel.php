@@ -7,7 +7,7 @@ use Pingu\Jsgrid\Fields\Text as JsGridText;
 use Pingu\Jsgrid\Events\JsGridFieldsBuilt;
 use Pingu\Jsgrid\Events\JsGridOptionsBuilt;
 
-trait JsGridable {
+trait JsGridableModel {
 
 	/**
 	 * List of fields displayed in jsGrid
