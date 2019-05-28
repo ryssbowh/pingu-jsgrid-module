@@ -15,13 +15,6 @@ interface JsGridableModel extends APIableModel, FormableModel
     public static function jsGridFields();
 
     /**
-	 * JsGrids control field
-	 * @return array|false
-	 * @see  http://js-grid.com/docs/#grid-fields
-	 */
-    public static function jsGridControls();
-
-    /**
 	 * Returns the name of this jsgrid instance
 	 * @param  string $model
 	 * @return string

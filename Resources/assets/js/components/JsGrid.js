@@ -2,6 +2,7 @@ import jsGrid from 'jsgrid';
 import DatetimeField from './fields/datetime.js';
 import SelectField from './fields/select.js';
 import ModelField from './fields/model.js';
+import * as h from 'pingu-helpers';
 
 const JsGrid = (() => {
 
@@ -13,72 +14,94 @@ const JsGrid = (() => {
 		console.log('JsGrid initialized');
 
 		if(options.jsgrid.length){
-
 			SelectField.init();
 			DatetimeField.init();
 			ModelField.init();
-
+			options.jsgrid.on('jsgrid-error', function(e, action, data){
+				showErrors(data.responseJSON.message);
+			});
 			initJsGrid();
 		}
 	};
 
+	function reorganizeFilters(filters){
+		let data = {
+			pageIndex: filters.pageIndex,
+			pageSize: filters.pageSize,
+			sortField: filters.sortField,
+			sortOrder: filters.sortOrder
+		};
+		delete filters.pageIndex;
+		delete filters.pageSize;
+		delete filters.sortField;
+		delete filters.sortOrder;
+		data.filters = filters;
+		return data;
+	}
+
 	function initJsGrid(){
 		let jsOptions = options.jsgrid.data('options');
-		let jsExtraOptions = options.jsgrid.data('extraoptions');
-		jsOptions.fields = options.jsgrid.data('fields');
+
 		jsOptions.rowClick = function(params){
-			window.location.href = jsOptions.editUrl+'/'+params.item.id;
+			if(jsOptions.canClick){
+				window.location.href = replaceUriToken(jsOptions.clickUrl, params.item);
+			}
 		};
-		jsOptions.onDataLoading = function(params){
-			params.filter.fields = params.grid.getFilter();
-		};
+
 		jsOptions.controller = {
-			loadData: function(filter){
-				return $.ajax({
-		            type: "POST",
-		            url: jsOptions.ajaxUrl,
-		            data: {filters:filter, options:jsExtraOptions}
-	        	}).done(function(data){
-		        	$('.jsgrid-total').html(data.total);
-		        	$('.jsgrid-total').parent().show();
-	        	}).fail(function(data){
-	        		showErrors(data.responseJSON.errors);
-	        	});
+			loadData: function(filters){
+				let d = $.Deferred();
+				filters = reorganizeFilters(filters);
+				h.get(jsOptions.apiIndexUri, filters)
+					.done(function(data){
+			        	$('.jsgrid-total').html(data.total);
+			        	$('.jsgrid-total').parent().show();
+			        	d.resolve({data:data.models});
+		        	}).fail(function(data){
+		        		options.jsgrid.trigger('jsgrid-error', ['load', data]);
+		        		d.reject();
+		        	});
+		        return d.promise();
 			},
 			updateItem: function(item){
-				console.log(item);
-				return $.ajax({
-			        type: "PUT",
-			        url: jsOptions.ajaxUrl,
-			        data: item,
-		       	}).fail(function(data){
-	        		showErrors(data.responseJSON.errors);
-	        	});
+				let url = replaceUriToken(jsOptions.apiUpdateUri, item);
+				delete item[jsOptions.primaryKey];
+				let d = $.Deferred();
+				h.put(url,item)
+					.done(function(data){
+						d.resolve(data.model);
+					})
+					.fail(function(data){
+		        		options.jsgrid.trigger('jsgrid-error', ['update', data, item]);
+		        		d.reject();
+		        	});
+		        return d.promise();
 			},
 			deleteItem: function(item){
-				return $.ajax({
-			        type: "DELETE",
-			        url: jsOptions.ajaxUrl,
-			        data: {id:item.id},
-		       	}).fail(function(data){
-	        		showErrors(data.responseJSON.errors);
-	        	});
+				let url = replaceUriToken(jsOptions.apiDeleteUri, item);
+				return h._delete(url)
+					.fail(function(data){
+		        		options.jsgrid.trigger('jsgrid-error', ['delete', data, item]);
+		        	});
 			}
 		};
 
 		options.jsgrid.jsGrid(jsOptions);
 	};
 
-	function showErrors(errors){
-		var text = "";
-		$.each(errors, function(item){
-			text += errors[item] + "\n";
-		});
-		alert(text);
+	function replaceUriToken(url, item){
+		let match = url.match(/^.*\{([a-zA-Z]+)\}.*$/);
+		return url.replace('{'+match[1]+'}',item[match[1]]);
+
+	}
+
+	function showErrors(message){
+		alert(message);
 	}
 
 	return {
-		init: init
+		init: init,
+		showErrors: showErrors
 	};
 
 })();

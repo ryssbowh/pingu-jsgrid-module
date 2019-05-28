@@ -4,7 +4,10 @@
 - [ ] test thoroughly all fields
 - [ ] Make model fields lazyload them
 
-## v1.1 Refactored controllers
+## v1.1
+- Refactored controllers to make it more reusable
+- integration to route slugs routes in api
+
 ## v1.0.5 wrote readme
 
 ### JsGrid

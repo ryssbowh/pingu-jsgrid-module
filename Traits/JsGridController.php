@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use Pingu\Core\Entities\BaseModel;
 use Pingu\Forms\Form;
 use Pingu\Jsgrid\Contracts\JsGridableModel;
+use Pingu\Jsgrid\Events\JsGridOptionsBuilt;
+use Pingu\Jsgrid\Exceptions\JsGridException;
 
 trait JsGridController
 {
@@ -17,7 +19,7 @@ trait JsGridController
 	 * @param  array|null     $contextualLink
 	 * @return array
 	 */
-	public function buildRelatedJsGridView(JsGridableModel $model, Request $request, ?array $contextualLink = null)
+	protected function buildRelatedJsGridView(JsGridableModel $model, Request $request, ?array $contextualLink = null)
 	{
 		$extraOptions = [
 			'relatedModel' => get_class($model),
@@ -47,22 +49,46 @@ trait JsGridController
 	 * @param  Request   $request
 	 * @return array
 	 */
-	public function buildJsGridView(Request $request)
+	protected function buildJsGridView(Request $request)
 	{
 		$model = $this->getModel();
-		$title = str_plural($model::friendlyName());
-		$options = $model::buildJsGridOptions();
-		$options['ajaxUrl'] = $model::apiUrl();
-		$options['editUrl'] = $model::adminEditUrl();
+		if(!(new $model) instanceof JsGridableModel){
+			throw new JsGridException($model." must implement JsGridableModel to use JsGrid");
+		}
+		$options = array_merge(config("jsgrid.jsGridDefaults"), $this->getJsGridOptions());
+		$controls = $this->controls();
+		$options['primaryKey'] = $model::keyName();
+		$options['apiIndexUri'] = $this->getApiIndexUri();
+		$options['canClick'] = $this->canClick();
+		$options['editing'] = $controls['editButton'] = $this->canEdit();
+		$options['deleting'] = $controls['deleteButton'] = $this->canDelete();
+		$options['fields'] = $model::buildJsGridFields($this->fields());
+		$options['fields'][] = $controls;
+		if($this->canClick()){
+			$options['clickUrl'] = $this->getClickLink();
+		}
+		if($this->canEdit()){
+			$options['apiUpdateUri'] = $this->getApiUpdateUri();
+		}
+		if($this->canDelete()){
+			$options['apiDeleteUri'] = $this->getApiDeleteUri();
+		}
+		$name = $model::jsGridInstanceName();
+		event(new JsGridOptionsBuilt($name, $options));
 		
 		return [
-			'title' => $title,
-			'name' => $model::jsGridInstanceName(),
-			'fields' => $model::buildJsGridFields(),
-			'options' => json_encode($options),
-			'extra' => json_encode($extraOptions ?? []),
-			'addUrl' => $model::adminAddUrl()
+			'name' => $name, 
+			'options' => $options
 		];
+	}
+
+	/**
+	 * returns jsgrid options for that instance of jsgrid
+	 * @return array
+	 */
+	protected function getJsGridOptions()
+	{
+		return [];
 	}
 
 	/**
@@ -71,7 +97,7 @@ trait JsGridController
 	 * @param  JsGridableModel $model
 	 * @return view
 	 */
-	public function relatedJsGridList(Request $request, JsGridableModel $model)
+	protected function relatedJsGridList(Request $request, JsGridableModel $model)
 	{
 		if(!isset($request->route()->action['contextualLink'])) throw new Exception('contextualLink is not set for that route');
 		$contextualLink = $request->route()->action['contextualLink'];
@@ -85,16 +111,109 @@ trait JsGridController
 	}
 
 	/**
-	 * Point of entry for a jsGrid list
-	 * The model class must be set manually within the route.
-	 * If listing results for a related model, the contextualLink must be set within the route.
-	 * @param  Request $request
-	 * @return view
+	 * Replace the routeslug in the rui with the primary key
+	 * @param  string $uri
+	 * @return string
 	 */
-	public function jsGridList(Request $request)
+	protected function replaceUriTokens(string $uri)
 	{
-		$options = $this->buildJsGridView($request);
+		if(is_null($uri)) return null;
+		$model = $this->getModel();
+		$slug = $model::routeSlug();
+		$key = (new $model)->getKeyName();
 
-		return view('jsgrid::list')->with($options);
+		preg_match('/^.*\{('.$slug.')\}.*$/', $uri, $matches);
+        if($matches){
+            foreach($matches as $match){
+                $uri = str_replace('{'.$match.'}', '{'.$key.'}', $uri);
+            }
+        }
+        return $uri;
 	}
+
+	/**
+	 * The uri used by jsgrid to get models
+	 * @return string
+	 */
+	protected function getApiIndexUri()
+	{
+		return $this->getModel()::getApiUri('index', true);
+	}
+
+	/**
+	 * The uri used by jsgrid to get models
+	 * @return string
+	 */
+	protected function getApiDeleteUri()
+	{
+		return $this->replaceUriTokens($this->getModel()::getApiUri('delete', true));
+	}
+
+	/**
+	 * The uri used by jsgrid to edit models
+	 * @return string
+	 */
+	protected function getApiUpdateUri()
+	{
+		return $this->replaceUriTokens($this->getModel()::getApiUri('delete', true));
+	}
+
+	/**
+	 * The url used by jsgrid to redirect when an element is clicked
+	 * @return [type] [description]
+	 */
+	protected function getClickLink()
+	{
+		$model = $this->getModel();
+		$slug = $model::routeSlug();
+		$key = (new $model)->getKeyName();
+		return '/admin/'.$slug.'/{'.$key.'}/edit';
+	}
+
+	/**
+	 * Can the user click on items and be redirected
+	 * @return bool
+	 */
+	protected function canClick()
+	{
+		return false;
+	}
+
+	/**
+	 * Can the user edit objects
+	 * @return bool
+	 */
+	protected function canEdit()
+	{
+		return false;
+	}
+
+	/**
+	 * Can the user delete objects
+	 * @return bool
+	 */
+	protected function canDelete()
+	{
+		return false;
+	}
+
+	/**
+	 * Fields to show for hat instance of jsgrid, default to all defined fields
+	 * @return array
+	 */
+	protected function fields()
+	{
+		$model = $this->getModel();
+		return array_keys($model::jsGridFields());
+	}
+
+	/**
+	 * JsGrid controls for that instance of jsgrid
+	 * @return array
+	 */
+	protected function controls()
+	{
+		return ['type' => 'control'];
+	}
+
 }

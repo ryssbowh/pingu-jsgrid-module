@@ -3,31 +3,12 @@ namespace Pingu\Jsgrid\Traits;
 
 use Pingu\Forms\Fields\Number;
 use Pingu\Forms\Fields\Text;
-use Pingu\Jsgrid\Fields\Text as JsGridText;
 use Pingu\Jsgrid\Events\JsGridFieldsBuilt;
 use Pingu\Jsgrid\Events\JsGridOptionsBuilt;
+use Pingu\Jsgrid\Fields\Number as JsGridNumber;
+use Pingu\Jsgrid\Fields\Text as JsGridText;
 
 trait JsGridableModel {
-
-	/**
-	 * List of fields displayed in jsGrid
-	 * @return array
-	 * @see  http://js-grid.com/docs/#grid-fields
-	 */
-    public static function jsGridFields()
-    {
-        return [];
-    }
-
-    /**
-	 * JsGrids control field
-	 * @return array|false
-	 * @see  http://js-grid.com/docs/#grid-fields
-	 */
-    public static function jsGridControls()
-    {
-        return ['type' => 'control'];
-    }
 
     /**
 	 * Returns the name of this jsgrid instance
@@ -36,37 +17,24 @@ trait JsGridableModel {
 	 */
 	public static function jsGridInstanceName()
 	{
-		return strtolower(classname(get_called_class()));
-	}
-
-	/**
-	 * Returns the default options for a jsgrid
-	 * @param  string $model
-	 * @return array
-	 */
-	public static function buildJsGridOptions()
-	{
-		$options = config("jsgrid.jsGridDefaults");
-		$name = self::jsGridInstanceName();
-		event(new JsGridOptionsBuilt($name, $options));
-		return $options;
+		return strtolower(class_basename(get_called_class()));
 	}
 
 	/**
 	 * Builds field definitions for a jsgrid instance
 	 * @param  string $model
+	 * @param  array  $fields
 	 * @return array
 	 * @see http://js-grid.com/docs/#configuration
 	 */
-	public static function buildJsGridFields()
+	public static function buildJsGridFields(array $fields)
 	{
 		$fieldsDef = self::fieldDefinitions();
-		$jsGridFields = self::jsGridFields();
-		$controls = self::jsGridControls();
+		$jsGridFields = array_intersect_key(self::jsGridFields(), array_flip($fields));
 		$fields = [];
 
 		$idDef = ['id' => ['type' => Number::class]];
-		$idJsGrid = ['id' => ['visible' => false, 'editing' => false]];
+		$idJsGrid = ['id' => ['type' => JsGridNumber::class, 'visible' => false, 'editing' => false, 'filtering' => false]];
 
 		if(!isset($jsGridFields['id'])){
 			$jsGridFields = $idJsGrid + $jsGridFields;
@@ -90,13 +58,8 @@ trait JsGridableModel {
 			$fields[$name] = $jsGridField->getOptions();
 		}
 
-		if($controls){
-			if(!isset($controls['type'])) $controls['type'] = 'control';
-			$fields['_controls'] = $controls;
-		}
-
 		event(new JsGridFieldsBuilt($name, $fields));
 
-		return json_encode(array_values($fields));
+		return array_values($fields);
 	}
 }
