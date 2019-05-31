@@ -52,7 +52,7 @@ const JsGrid = (() => {
 			loadData: function(filters){
 				let d = $.Deferred();
 				filters = reorganizeFilters(filters);
-				h.get(jsOptions.apiIndexUri, filters)
+				h.get(jsOptions.ajaxIndexUri, filters)
 					.done(function(data){
 			        	$('.jsgrid-total').html(data.total);
 			        	$('.jsgrid-total').parent().show();
@@ -64,7 +64,7 @@ const JsGrid = (() => {
 		        return d.promise();
 			},
 			updateItem: function(item){
-				let url = replaceUriToken(jsOptions.apiUpdateUri, item);
+				let url = replaceUriToken(jsOptions.ajaxUpdateUri, item);
 				delete item[jsOptions.primaryKey];
 				let d = $.Deferred();
 				h.put(url,item)
@@ -78,7 +78,7 @@ const JsGrid = (() => {
 		        return d.promise();
 			},
 			deleteItem: function(item){
-				let url = replaceUriToken(jsOptions.apiDeleteUri, item);
+				let url = replaceUriToken(jsOptions.ajaxDeleteUri, item);
 				return h._delete(url)
 					.fail(function(data){
 		        		options.jsgrid.trigger('jsgrid-error', ['delete', data, item]);

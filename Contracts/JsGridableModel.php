@@ -1,10 +1,10 @@
 <?php 
 namespace Pingu\Jsgrid\Contracts;
 
-use Pingu\Core\Contracts\APIableModel;
+use Pingu\Core\Contracts\AjaxableModel;
 use Pingu\Forms\Contracts\FormableModel;
 
-interface JsGridableModel extends APIableModel, FormableModel
+interface JsGridableModel extends AjaxableModel, FormableModel
 {
 
 	/**

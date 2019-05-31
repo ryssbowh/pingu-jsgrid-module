@@ -58,7 +58,7 @@ trait JsGridController
 		$options = array_merge(config("jsgrid.jsGridDefaults"), $this->getJsGridOptions());
 		$controls = $this->controls();
 		$options['primaryKey'] = $model::keyName();
-		$options['apiIndexUri'] = $this->getApiIndexUri();
+		$options['ajaxIndexUri'] = $this->getAjaxIndexUri();
 		$options['canClick'] = $this->canClick();
 		$options['editing'] = $controls['editButton'] = $this->canEdit();
 		$options['deleting'] = $controls['deleteButton'] = $this->canDelete();
@@ -68,10 +68,10 @@ trait JsGridController
 			$options['clickUrl'] = $this->getClickLink();
 		}
 		if($this->canEdit()){
-			$options['apiUpdateUri'] = $this->getApiUpdateUri();
+			$options['ajaxUpdateUri'] = $this->getAjaxUpdateUri();
 		}
 		if($this->canDelete()){
-			$options['apiDeleteUri'] = $this->getApiDeleteUri();
+			$options['ajaxDeleteUri'] = $this->getAjaxDeleteUri();
 		}
 		$name = $model::jsGridInstanceName();
 		event(new JsGridOptionsBuilt($name, $options));
@@ -135,27 +135,27 @@ trait JsGridController
 	 * The uri used by jsgrid to get models
 	 * @return string
 	 */
-	protected function getApiIndexUri()
+	protected function getAjaxIndexUri()
 	{
-		return $this->getModel()::getApiUri('index', true);
+		return $this->getModel()::getAjaxUri('index', true);
 	}
 
 	/**
 	 * The uri used by jsgrid to get models
 	 * @return string
 	 */
-	protected function getApiDeleteUri()
+	protected function getAjaxDeleteUri()
 	{
-		return $this->replaceUriTokens($this->getModel()::getApiUri('delete', true));
+		return $this->replaceUriTokens($this->getModel()::getAjaxUri('delete', true));
 	}
 
 	/**
 	 * The uri used by jsgrid to edit models
 	 * @return string
 	 */
-	protected function getApiUpdateUri()
+	protected function getAjaxUpdateUri()
 	{
-		return $this->replaceUriTokens($this->getModel()::getApiUri('delete', true));
+		return $this->replaceUriTokens($this->getModel()::getAjaxUri('update', true));
 	}
 
 	/**

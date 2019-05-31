@@ -4,6 +4,9 @@
 - [ ] test thoroughly all fields
 - [ ] Make model fields lazyload them
 
+## v1.1.2
+- renamed api in ajax
+
 ## v1.1
 - Refactored controllers to make it more reusable
 - integration to route slugs routes in api
@@ -20,7 +23,7 @@ To make a model JsGridable it'll need to implement `JsGridableContract` and use 
 
 You can't use jsGrid if your model is not Formable, therefore a model that implements `JsGridableContract` automatically implements `FormableContract` and must therefore use the traits associated with that contract.
 
-JsGrid is ajax driven and use the api framework as defined in Core, therefore a model that implements `JsGridableContract` automatically implements `APIableModelContract` and must therefore use the traits associated with that contract.
+JsGrid is ajax driven and use the api framework as defined in Core, therefore a model that implements `JsGridableModel` automatically implements `AjaxableModel` and must therefore use the traits associated with that contract.
 
 ### Assets
 If you can't find in the Resources/assets/js/components/fields folder the field you have defined, it means it uses the default js code that jsgrid provides.
