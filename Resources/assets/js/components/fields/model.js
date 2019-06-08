@@ -41,7 +41,7 @@ const ModelField = (() => {
                     });
                 }
 
-                return $result;
+                return $result; 
             },
 
             editValue: function() {
@@ -51,7 +51,7 @@ const ModelField = (() => {
             itemTemplate: function(value) {
                 var items = this.items,
                     valueField = this.valueField,
-                    textField = this.textField,
+                    textField = Array.isArray(this.textField) ? this.textField : [this.textField],
                     me = this,
                     separator = this.separator,
                     result;
@@ -84,7 +84,7 @@ const ModelField = (() => {
             },
 
             editTemplate: function(value) {
-                var valueField = this.valueField;
+                var valueField = this.valueField
 
                 if(!this.editing)
                     return this.itemTemplate.apply(this, arguments);

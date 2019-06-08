@@ -4,6 +4,11 @@
 - [ ] test thoroughly all fields
 - [ ] Make model fields lazyload them
 
+## v1.1.3
+- added checkbox field
+- renamed Contracts/Traits
+- added doc
+
 ## v1.1.2
 - renamed api in ajax
 

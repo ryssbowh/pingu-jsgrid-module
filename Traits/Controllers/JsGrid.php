@@ -1,25 +1,25 @@
 <?php
 
-namespace Pingu\Jsgrid\Traits;
+namespace Pingu\Jsgrid\Traits\Controllers;
 
 use ContextualLinks,Notify;
 use Illuminate\Http\Request;
 use Pingu\Core\Entities\BaseModel;
 use Pingu\Forms\Form;
-use Pingu\Jsgrid\Contracts\JsGridableModel;
+use Pingu\Jsgrid\Contracts\Models\JsGridableContract;
 use Pingu\Jsgrid\Events\JsGridOptionsBuilt;
 use Pingu\Jsgrid\Exceptions\JsGridException;
 
-trait JsGridController
+trait JsGrid
 {
 	/**
 	 * builds jsGrid options for a related jsGrid list view.
-	 * @param  JsGridableModel    $model
+	 * @param  JsGridableContract $model
 	 * @param  Request   $request
 	 * @param  array|null     $contextualLink
 	 * @return array
 	 */
-	protected function buildRelatedJsGridView(JsGridableModel $model, Request $request, ?array $contextualLink = null)
+	protected function buildRelatedJsGridView(JsGridableContract $model, Request $request, ?array $contextualLink = null)
 	{
 		$extraOptions = [
 			'relatedModel' => get_class($model),
@@ -52,8 +52,8 @@ trait JsGridController
 	protected function buildJsGridView(Request $request)
 	{
 		$model = $this->getModel();
-		if(!(new $model) instanceof JsGridableModel){
-			throw new JsGridException($model." must implement JsGridableModel to use JsGrid");
+		if(!(new $model) instanceof JsGridableContract){
+			throw new JsGridException($model." must implement JsGridableContract to use JsGrid");
 		}
 		$options = array_merge(config("jsgrid.jsGridDefaults"), $this->getJsGridOptions());
 		$controls = $this->controls();
@@ -94,10 +94,10 @@ trait JsGridController
 	/**
 	 * Builds a jsGrid for a related object
 	 * @param  Request   $request
-	 * @param  JsGridableModel $model
+	 * @param  JsGridableContract $model
 	 * @return view
 	 */
-	protected function relatedJsGridList(Request $request, JsGridableModel $model)
+	protected function relatedJsGridList(Request $request, JsGridableContract $model)
 	{
 		if(!isset($request->route()->action['contextualLink'])) throw new Exception('contextualLink is not set for that route');
 		$contextualLink = $request->route()->action['contextualLink'];
@@ -120,7 +120,7 @@ trait JsGridController
 		if(is_null($uri)) return null;
 		$model = $this->getModel();
 		$slug = $model::routeSlug();
-		$key = (new $model)->getKeyName();
+		$key = (new $model)->getRouteKeyName();
 
 		preg_match('/^.*\{('.$slug.')\}.*$/', $uri, $matches);
         if($matches){
@@ -166,7 +166,7 @@ trait JsGridController
 	{
 		$model = $this->getModel();
 		$slug = $model::routeSlug();
-		$key = (new $model)->getKeyName();
+		$key = (new $model)->getRouteKeyName();
 		return '/admin/'.$slug.'/{'.$key.'}/edit';
 	}
 

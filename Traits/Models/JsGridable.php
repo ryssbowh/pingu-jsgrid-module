@@ -1,5 +1,5 @@
 <?php 
-namespace Pingu\Jsgrid\Traits;
+namespace Pingu\Jsgrid\Traits\Models;
 
 use Pingu\Forms\Fields\Number;
 use Pingu\Forms\Fields\Text;
@@ -8,7 +8,7 @@ use Pingu\Jsgrid\Events\JsGridOptionsBuilt;
 use Pingu\Jsgrid\Fields\Number as JsGridNumber;
 use Pingu\Jsgrid\Fields\Text as JsGridText;
 
-trait JsGridableModel {
+trait JsGridable {
 
     /**
 	 * Returns the name of this jsgrid instance
@@ -29,7 +29,7 @@ trait JsGridableModel {
 	 */
 	public static function buildJsGridFields(array $fields)
 	{
-		$fieldsDef = self::fieldDefinitions();
+		$fieldsDef = (new self)->getFieldDefinitions();
 		$jsGridFields = array_intersect_key(self::jsGridFields(), array_flip($fields));
 		$fields = [];
 
