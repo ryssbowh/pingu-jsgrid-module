@@ -52,7 +52,8 @@ trait JsGrid
 	protected function buildJsGridView(Request $request)
 	{
 		$model = $this->getModel();
-		if(!(new $model) instanceof JsGridableContract){
+		$model = new $model;
+		if(!$model instanceof JsGridableContract){
 			throw new JsGridException($model." must implement JsGridableContract to use JsGrid");
 		}
 		$options = array_merge(config("jsgrid.jsGridDefaults"), $this->getJsGridOptions());
@@ -62,7 +63,7 @@ trait JsGrid
 		$options['canClick'] = $this->canClick();
 		$options['editing'] = $controls['editButton'] = $this->canEdit();
 		$options['deleting'] = $controls['deleteButton'] = $this->canDelete();
-		$options['fields'] = $model::buildJsGridFields($this->fields());
+		$options['fields'] = $model->buildJsGridFields($model->jsGridFields());
 		$options['fields'][] = $controls;
 		if($this->canClick()){
 			$options['clickUrl'] = $this->getClickLink();
@@ -111,7 +112,7 @@ trait JsGrid
 	}
 
 	/**
-	 * Replace the routeslug in the rui with the primary key
+	 * Replace the route slug in the uri with the primary key
 	 * @param  string $uri
 	 * @return string
 	 */
@@ -133,6 +134,7 @@ trait JsGrid
 
 	/**
 	 * The uri used by jsgrid to get models
+	 * 
 	 * @return string
 	 */
 	protected function getAjaxIndexUri()
@@ -141,7 +143,8 @@ trait JsGrid
 	}
 
 	/**
-	 * The uri used by jsgrid to get models
+	 * The uri used by jsgrid to delete models
+	 * 
 	 * @return string
 	 */
 	protected function getAjaxDeleteUri()
@@ -150,7 +153,8 @@ trait JsGrid
 	}
 
 	/**
-	 * The uri used by jsgrid to edit models
+	 * The uri used by jsgrid to update models
+	 * 
 	 * @return string
 	 */
 	protected function getAjaxUpdateUri()
@@ -160,7 +164,8 @@ trait JsGrid
 
 	/**
 	 * The url used by jsgrid to redirect when an element is clicked
-	 * @return [type] [description]
+	 * 
+	 * @return string
 	 */
 	protected function getClickLink()
 	{
@@ -172,6 +177,7 @@ trait JsGrid
 
 	/**
 	 * Can the user click on items and be redirected
+	 * 
 	 * @return bool
 	 */
 	protected function canClick()
@@ -181,6 +187,7 @@ trait JsGrid
 
 	/**
 	 * Can the user edit objects
+	 * 
 	 * @return bool
 	 */
 	protected function canEdit()
@@ -190,6 +197,7 @@ trait JsGrid
 
 	/**
 	 * Can the user delete objects
+	 * 
 	 * @return bool
 	 */
 	protected function canDelete()
@@ -198,17 +206,8 @@ trait JsGrid
 	}
 
 	/**
-	 * Fields to show for hat instance of jsgrid, default to all defined fields
-	 * @return array
-	 */
-	protected function fields()
-	{
-		$model = $this->getModel();
-		return array_keys($model::jsGridFields());
-	}
-
-	/**
 	 * JsGrid controls for that instance of jsgrid
+	 * 
 	 * @return array
 	 */
 	protected function controls()

@@ -1,21 +1,27 @@
 <?php
 namespace Pingu\Jsgrid\Fields;
 
-use Pingu\Forms\Fields\Field;
+use Pingu\Forms\Support\Field;
 
 abstract class JsGridField
 {
 	protected $options;
+	public $name;
+	public $type;
+	public $field;
 
 	public function __construct(array $options, Field $field)
 	{
-		$this->options = $options;
 		$this->name = $field->getName();
+		$this->field = $field;
 		$this->type = strtolower(class_basename($this));
-		$this->options['type'] = strtolower(class_basename($this));
-		$this->options = array_merge($field->getOptions(), $this->options);
-		if(!isset($this->options['title'])) $this->options['title'] = $this->options['label'] ?? ucfirst($this->name);
-		unset($this->options['label']);
+		$options['title'] = $options['title'] ?? $field->option('label') ?? ucfirst($this->name);
+		$this->options = collect($options);
+	}
+
+	public function getType()
+	{
+		return $this->type;
 	}
 
 	public function getOptions()
@@ -23,8 +29,22 @@ abstract class JsGridField
 		return $this->options;
 	}
 
-	public function setOption($name, $value)
+	public function option($name, $value = null)
 	{
-		$this->options[$name] = $value;
+		if(is_null($values)){
+			return $this->options->get($name);
+		}
+		$this->options->put($name, $value);
+		return $this;
+	}
+
+	public function toArray()
+	{
+		$array = $this->options->toArray();
+		$array['name'] = $this->name;
+		$array['type'] = $this->getType();
+		$array['options'] = $this->field->options->toArray();
+		$array['attributes'] = $this->field->attributes->toArray();
+		return $array;
 	}
 }

@@ -1,7 +1,7 @@
 import jsGrid from 'jsgrid';
 import DatetimeField from './fields/datetime.js';
 import SelectField from './fields/select.js';
-import ModelField from './fields/model.js';
+import ModelSelectField from './fields/modelselect.js';
 import * as h from 'pingu-helpers';
 
 const JsGrid = (() => {
@@ -16,7 +16,7 @@ const JsGrid = (() => {
 		if(options.jsgrid.length){
 			SelectField.init();
 			DatetimeField.init();
-			ModelField.init();
+			ModelSelectField.init();
 			options.jsgrid.on('jsgrid-error', function(e, action, data){
 				showErrors(data.responseJSON.message);
 			});

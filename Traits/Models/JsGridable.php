@@ -1,11 +1,13 @@
 <?php 
 namespace Pingu\Jsgrid\Traits\Models;
 
-use Pingu\Forms\Fields\Number;
-use Pingu\Forms\Fields\Text;
+use Pingu\Forms\Support\Field;
+use Pingu\Forms\Support\Fields\TextInput;
+use Pingu\Forms\Support\Types\Integer;
 use Pingu\Jsgrid\Events\JsGridFieldsBuilt;
 use Pingu\Jsgrid\Events\JsGridOptionsBuilt;
 use Pingu\Jsgrid\Fields\Number as JsGridNumber;
+use Pingu\Jsgrid\Fields\Number;
 use Pingu\Jsgrid\Fields\Text as JsGridText;
 
 trait JsGridable {
@@ -27,39 +29,38 @@ trait JsGridable {
 	 * @return array
 	 * @see http://js-grid.com/docs/#configuration
 	 */
-	public static function buildJsGridFields(array $fields)
+	public function buildJsGridFields(array $fieldDefs)
 	{
-		$fieldsDef = (new self)->getFieldDefinitions();
-		$jsGridFields = array_intersect_key(self::jsGridFields(), array_flip($fields));
+		$fieldsDef = $this->getFieldDefinitions();
 		$fields = [];
 
-		$idDef = ['id' => ['type' => Number::class]];
-		$idJsGrid = ['id' => ['type' => JsGridNumber::class, 'visible' => false, 'editing' => false, 'filtering' => false]];
+		foreach($fieldDefs as $name => $jsGridField){
+			//Silently assigning a default text type
+			if(!isset($jsGridField['type'])) $jsGridField['type'] = JsGridText::class;
 
-		if(!isset($jsGridFields['id'])){
-			$jsGridFields = $idJsGrid + $jsGridFields;
+			$field = $this->buildFieldClass($name);
+
+			$jsGridFieldInstance = new $jsGridField['type']($jsGridField['options'] ?? [], $field);
+
+			$fields[] = $jsGridFieldInstance;
 		}
 
-		if(!isset($fieldsDef['id'])){
-			$fieldsDef = $idDef + $fieldsDef;
+		if(!isset($fields[$this->getKeyName()])){
+			$fields[] = new JsGridText([
+					'visible' => false, 
+					'editing' => false, 
+					'filtering' => false
+				],
+				new TextInput($this->getKeyName()));
 		}
 		else{
-			$fieldsDef['id']['editing'] = false;
-		}
-
-		foreach($jsGridFields as $name => $jsgridOptions){
-			if(!isset($fieldsDef[$name])) continue;
-			if(!isset($jsGridFields[$name]['type'])) $jsGridFields[$name]['type'] = JsGridText::class;
-
-			$options = $fieldsDef[$name];
-			$field = new $options['type']($name, $fieldsDef[$name]);
-			$jsGridField = new $jsGridFields[$name]['type']($jsGridFields[$name], $field);
-
-			$fields[$name] = $jsGridField->getOptions();
+			$fields[$this->getKeyName()]->option('editing', false);
 		}
 
 		event(new JsGridFieldsBuilt($name, $fields));
 
-		return array_values($fields);
+		return array_map(function($field){
+			return $field->toArray();
+		}, $fields);
 	}
 }
