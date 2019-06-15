@@ -47,9 +47,6 @@ class JsGridServiceProvider extends ServiceProvider
      */
     protected function registerConfig()
     {
-        $this->publishes([
-            __DIR__.'/../Config/config.php' => config_path('jsgrid.php'),
-        ], 'config');
         $this->mergeConfigFrom(
             __DIR__.'/../Config/config.php', 'jsgrid'
         );
