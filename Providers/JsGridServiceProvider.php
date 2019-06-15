@@ -2,11 +2,11 @@
 
 namespace Pingu\Jsgrid\Providers;
 
-use Illuminate\Support\ServiceProvider;
-use Illuminate\Database\Eloquent\Factory;
 use Asset;
+use Illuminate\Database\Eloquent\Factory;
+use Pingu\Core\Support\ModuleServiceProvider;
 
-class JsGridServiceProvider extends ServiceProvider
+class JsGridServiceProvider extends ModuleServiceProvider
 {
     /**
      * Indicates if loading of the provider is deferred.
