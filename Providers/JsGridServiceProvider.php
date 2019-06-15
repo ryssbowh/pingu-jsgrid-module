@@ -57,8 +57,8 @@ class JsGridServiceProvider extends ServiceProvider
 
     public function registerAssets()
     {
-        Asset::container('modules')->add('jsgrid-js', 'modules/Jsgrid/js/Jsgrid.js');
-        Asset::container('modules')->add('jsgrid-css', 'modules/Jsgrid/css/Jsgrid.css');
+        Asset::container('modules')->add('jsgrid-js', 'module-assets/Jsgrid/js/Jsgrid.js');
+        Asset::container('modules')->add('jsgrid-css', 'module-assets/Jsgrid/css/Jsgrid.css');
     }
 
     /**

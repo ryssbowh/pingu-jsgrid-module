@@ -5,7 +5,7 @@ var dir = __dirname;
 var name = dir.split(path.sep).pop();
 
 var assetPath = __dirname + '/Resources/assets';
-var publicPath = path.resolve(__dirname,'../../public/modules/'+name);
+var publicPath = path.resolve(__dirname,'../../public/module-assets/'+name);
 
 //Javascript
 mix.js(assetPath + '/js/app.js', publicPath + '/js/'+name+'.js').sourceMaps();
