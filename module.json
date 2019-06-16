@@ -8,7 +8,9 @@
     "providers": [
         "Pingu\\Jsgrid\\Providers\\JsGridServiceProvider"
     ],
-    "aliases": {},
+    "aliases": {
+        "JsGrid" : "Pingu\\Jsgrid\\JsGrid"
+    },
     "files": [
         "start.php"
     ],

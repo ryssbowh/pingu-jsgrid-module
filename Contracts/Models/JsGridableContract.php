@@ -9,7 +9,10 @@ interface JsGridableContract extends HasAjaxRoutesContract, FormableContract
 {
 
 	/**
-	 * List of fields displayed in jsGrid
+	 * List of fields displayed in jsGrid, that can also define fields that
+	 * don't exists in the model, in which case an accessor will be called
+	 * eg : getJsGridImageField for the field 'image'
+	 * 
 	 * @return array
 	 * @see  http://js-grid.com/docs/#grid-fields
 	 */
@@ -17,6 +20,7 @@ interface JsGridableContract extends HasAjaxRoutesContract, FormableContract
 
     /**
 	 * Returns the name of this jsgrid instance
+	 * 
 	 * @param  string $model
 	 * @return string
 	 */

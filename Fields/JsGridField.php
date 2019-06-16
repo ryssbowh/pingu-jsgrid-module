@@ -10,9 +10,9 @@ abstract class JsGridField
 	public $type;
 	public $field;
 
-	public function __construct(array $options, Field $field)
+	public function __construct(string $name, array $options, ?Field $field)
 	{
-		$this->name = $field->getName();
+		$this->name = $name;
 		$this->field = $field;
 		$this->type = strtolower(class_basename($this));
 		$options['title'] = $options['title'] ?? $field->option('label') ?? ucfirst($this->name);

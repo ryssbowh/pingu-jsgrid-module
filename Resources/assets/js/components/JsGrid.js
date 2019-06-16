@@ -2,6 +2,7 @@ import jsGrid from 'jsgrid';
 import DatetimeField from './fields/datetime.js';
 import SelectField from './fields/select.js';
 import ModelSelectField from './fields/modelselect.js';
+import MediaField from './fields/media.js';
 import * as h from 'pingu-helpers';
 
 const JsGrid = (() => {
@@ -17,6 +18,7 @@ const JsGrid = (() => {
 			SelectField.init();
 			DatetimeField.init();
 			ModelSelectField.init();
+			MediaField.init();
 			options.jsgrid.on('jsgrid-error', function(e, action, data){
 				showErrors(data.responseJSON.message);
 			});
@@ -90,7 +92,7 @@ const JsGrid = (() => {
 	};
 
 	function replaceUriToken(url, item){
-		let match = url.match(/^.*\{([a-zA-Z]+)\}.*$/);
+		let match = url.match(/^.*\{([a-zA-Z0-9\-_]+)\}.*$/);
 		return url.replace('{'+match[1]+'}',item[match[1]]);
 
 	}

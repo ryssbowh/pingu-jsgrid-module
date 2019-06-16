@@ -3,9 +3,9 @@
 namespace Pingu\Jsgrid\Traits\Controllers;
 
 use ContextualLinks,Notify;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Pingu\Core\Entities\BaseModel;
-use Pingu\Forms\Form;
 use Pingu\Jsgrid\Contracts\Models\JsGridableContract;
 use Pingu\Jsgrid\Events\JsGridOptionsBuilt;
 use Pingu\Jsgrid\Exceptions\JsGridException;
@@ -16,32 +16,105 @@ trait JsGrid
 	 * builds jsGrid options for a related jsGrid list view.
 	 * @param  JsGridableContract $model
 	 * @param  Request   $request
-	 * @param  array|null     $contextualLink
+	 * @param  array|null     $contextualLink 
 	 * @return array
 	 */
-	protected function buildRelatedJsGridView(JsGridableContract $model, Request $request, ?array $contextualLink = null)
-	{
-		$extraOptions = [
-			'relatedModel' => get_class($model),
-			'relatedId' => $model->id,
-			'contextualLink' => $request->route()->action['contextualLink']
-		];
+	// protected function buildRelatedJsGridView(JsGridableContract $model, Request $request, ?array $contextualLink = null)
+	// {
+	// 	$extraOptions = [
+	// 		'relatedModel' => get_class($model),
+	// 		'relatedId' => $model->id,
+	// 		'contextualLink' => $request->route()->action['contextualLink']
+	// 	];
 
-		$title = $model::friendlyName().'\'s '.str_plural($contextualLink['model']::friendlyName());
-		$relatedModel = $contextualLink['model'];
+	// 	$title = $model::friendlyName().'\'s '.str_plural($contextualLink['model']::friendlyName());
+	// 	$relatedModel = $contextualLink['model'];
 
-		$options = $relatedModel::buildJsGridOptions();
-		$options['ajaxUrl'] = $relatedModel::apiUrl();
-		$options['editUrl'] = $relatedModel::adminEditUrl();
+	// 	$options = $relatedModel::buildJsGridOptions();
+	// 	$options['ajaxUrl'] = $relatedModel::apiUrl();
+	// 	$options['editUrl'] = $relatedModel::adminEditUrl();
 		
-		return [
-			'title' => $title,
-			'name' => $relatedModel::jsGridInstanceName(),
-			'fields' => $relatedModel::buildJsGridFields(),
-			'options' => json_encode($options),
-			'extra' => json_encode($extraOptions ?? []),
-			'addUrl' => $contextualLink['relatedAddUrl'] ?? $relatedModel::adminAddUrl()
-		];
+	// 	return [
+	// 		'title' => $title,
+	// 		'name' => $relatedModel::jsGridInstanceName(),
+	// 		'fields' => $relatedModel::buildJsGridFields(),
+	// 		'options' => json_encode($options),
+	// 		'extra' => json_encode($extraOptions ?? []),
+	// 		'addUrl' => $contextualLink['relatedAddUrl'] ?? $relatedModel::adminAddUrl()
+	// 	];
+	// }
+	
+	public function jsGridIndex(Request $request)
+	{
+		$modelStr = $this->getModel();
+		$model = new $modelStr;
+
+		$filters = $request->input('filters', []);
+		$options = $request->input('options', []);
+		$pageIndex = $request->input('pageIndex', 1);
+		$pageSize = $request->input('pageSize', $model->getPerPage());
+		$sortField = $request->input('sortField', $model->getKeyName());
+		$sortOrder = $request->input('sortOrder', 'asc');
+
+		$fieldsDef = $model->getFieldDefinitions();
+		$query = $model->newQuery();
+
+		foreach($filters as $field => $value){
+			if(!isset($fieldsDef[$field])){
+				//this field is not defined, it must be a field that doesn't exist in the model
+				//but still has a value for jsgrid (defined by its mutator)
+				continue;
+			}
+			$fieldDef = $fieldsDef[$field];
+			
+			if(!is_null($value)){
+				//we have a filter for that field, letting the field type doing its job :
+				$fieldDef->option('type')->filterQueryModifier($query, $field, $value);
+			}
+		}
+
+		$count = $query->count();
+
+		if($sortField){
+			$query->orderBy($sortField, $sortOrder);
+		}
+
+		$query->offset(($pageIndex-1) * $pageSize)->take($pageSize);
+
+		$models = $query->get();
+
+		return ['models' => $this->jsGridModels($models), 'total' => $count];
+	}
+
+	/**
+	 * build the response. Each model field will be populated by either
+	 * the model attribute or the mutator for jsgrid (getJsGridImageField for field image)
+	 * 
+	 * @param  Collection $models
+	 * @return array
+	 */
+	protected function jsGridModels(Collection $models)
+	{
+		if($models->isEmpty()) return [];
+		$out = [];
+		$fields = $models->first()->jsGridFields();
+		foreach($models as $index => $model){
+			$array = [
+				$model->getKeyName() => $model->getKey()
+			];
+			if($model->getRouteKeyName() != $model->getKeyName()){
+				$array[$model->getRouteKeyName()] = $model->getRouteKey();
+			}
+			foreach($fields as $field => $definition){
+				$method = 'getJsGrid'.ucfirst($field).'Field';
+				if(method_exists($model, $method)){
+					$array[$field] = $model->$method();
+				}
+				else $array[$field] = $model->$field;
+			}
+			$out[] = $array;
+		}
+		return $out;
 	}
 
 	/**
@@ -59,28 +132,36 @@ trait JsGrid
 		$options = array_merge(config("jsgrid.jsGridDefaults"), $this->getJsGridOptions());
 		$controls = $this->controls();
 		$options['primaryKey'] = $model::keyName();
-		$options['ajaxIndexUri'] = $this->getAjaxIndexUri();
+		$options['ajaxIndexUri'] = $this->getJsGridIndexUri();
 		$options['canClick'] = $this->canClick();
 		$options['editing'] = $controls['editButton'] = $this->canEdit();
 		$options['deleting'] = $controls['deleteButton'] = $this->canDelete();
-		$options['fields'] = $model->buildJsGridFields($model->jsGridFields());
+		$options['fields'] = $model->buildJsGridFields();
 		$options['fields'][] = $controls;
 		if($this->canClick()){
 			$options['clickUrl'] = $this->getClickLink();
 		}
 		if($this->canEdit()){
-			$options['ajaxUpdateUri'] = $this->getAjaxUpdateUri();
+			$options['ajaxUpdateUri'] = $this->getJsGridUpdateUri();
 		}
 		if($this->canDelete()){
-			$options['ajaxDeleteUri'] = $this->getAjaxDeleteUri();
+			$options['ajaxDeleteUri'] = $this->getJsGridDeleteUri();
 		}
 		$name = $model::jsGridInstanceName();
+
+		$options = $this->modifyJsGridDefinition($options);
+
 		event(new JsGridOptionsBuilt($name, $options));
 		
 		return [
 			'name' => $name, 
 			'options' => $options
 		];
+	}
+
+	protected function modifyJsGridDefinition(array $options)
+	{
+		return $options;
 	}
 
 	/**
@@ -98,21 +179,22 @@ trait JsGrid
 	 * @param  JsGridableContract $model
 	 * @return view
 	 */
-	protected function relatedJsGridList(Request $request, JsGridableContract $model)
-	{
-		if(!isset($request->route()->action['contextualLink'])) throw new Exception('contextualLink is not set for that route');
-		$contextualLink = $request->route()->action['contextualLink'];
+	// protected function relatedJsGridList(Request $request, JsGridableContract $model)
+	// {
+	// 	if(!isset($request->route()->action['contextualLink'])) throw new Exception('contextualLink is not set for that route');
+	// 	$contextualLink = $request->route()->action['contextualLink'];
 
-		$contextualLinks = $model->getContextualLinks();
-		if(!isset($contextualLinks[$contextualLink])) throw new Exception('contextual link '.$contextualLink.' doesn\'t exist for '.get_class($model));
-		$contextualLink = $contextualLinks[$contextualLink];
-		ContextualLinks::addLinks($contextualLinks);
-		$options = $this->buildRelatedJsGridView($model, $request, $contextualLink);
-		return view('jsgrid::list')->with($options);
-	}
+	// 	$contextualLinks = $model->getContextualLinks();
+	// 	if(!isset($contextualLinks[$contextualLink])) throw new Exception('contextual link '.$contextualLink.' doesn\'t exist for '.get_class($model));
+	// 	$contextualLink = $contextualLinks[$contextualLink];
+	// 	ContextualLinks::addLinks($contextualLinks);
+	// 	$options = $this->buildRelatedJsGridView($model, $request, $contextualLink);
+	// 	return view('jsgrid::list')->with($options);
+	// }
 
 	/**
 	 * Replace the route slug in the uri with the primary key
+	 * 
 	 * @param  string $uri
 	 * @return string
 	 */
@@ -137,7 +219,7 @@ trait JsGrid
 	 * 
 	 * @return string
 	 */
-	protected function getAjaxIndexUri()
+	protected function getJsGridIndexUri()
 	{
 		return $this->getModel()::getAjaxUri('index', true);
 	}
@@ -147,7 +229,7 @@ trait JsGrid
 	 * 
 	 * @return string
 	 */
-	protected function getAjaxDeleteUri()
+	protected function getJsGridDeleteUri()
 	{
 		return $this->replaceUriTokens($this->getModel()::getAjaxUri('delete', true));
 	}
@@ -157,7 +239,7 @@ trait JsGrid
 	 * 
 	 * @return string
 	 */
-	protected function getAjaxUpdateUri()
+	protected function getJsGridUpdateUri()
 	{
 		return $this->replaceUriTokens($this->getModel()::getAjaxUri('update', true));
 	}
@@ -169,10 +251,7 @@ trait JsGrid
 	 */
 	protected function getClickLink()
 	{
-		$model = $this->getModel();
-		$slug = $model::routeSlug();
-		$key = (new $model)->getRouteKeyName();
-		return '/admin/'.$slug.'/{'.$key.'}/edit';
+		return $this->replaceUriTokens($this->getModel()::getAdminUri('edit', true));
 	}
 
 	/**

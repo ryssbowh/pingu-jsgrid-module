@@ -5,6 +5,7 @@ namespace Pingu\Jsgrid\Providers;
 use Asset;
 use Illuminate\Database\Eloquent\Factory;
 use Pingu\Core\Support\ModuleServiceProvider;
+use Pingu\JsGrid\JsGrid;
 
 class JsGridServiceProvider extends ModuleServiceProvider
 {
@@ -37,7 +38,7 @@ class JsGridServiceProvider extends ModuleServiceProvider
      */
     public function register()
     {
-        //
+        
     }
 
     /**

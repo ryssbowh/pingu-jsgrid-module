@@ -29,24 +29,27 @@ trait JsGridable {
 	 * @return array
 	 * @see http://js-grid.com/docs/#configuration
 	 */
-	public function buildJsGridFields(array $fieldDefs)
+	public function buildJsGridFields()
 	{
-		$fieldsDef = $this->getFieldDefinitions();
+		$fieldsDef = $this->fieldDefinitions();
+		$jsGridFields = $this->jsGridFields();
 		$fields = [];
 
-		foreach($fieldDefs as $name => $jsGridField){
+		foreach($jsGridFields as $name => $jsGridField){
 			//Silently assigning a default text type
 			if(!isset($jsGridField['type'])) $jsGridField['type'] = JsGridText::class;
 
-			$field = $this->buildFieldClass($name);
-
-			$jsGridFieldInstance = new $jsGridField['type']($jsGridField['options'] ?? [], $field);
+			$field = null;
+			if(isset($fieldsDef[$name])){
+				$field = $this->buildFieldClass($name);
+			}
+			$jsGridFieldInstance = new $jsGridField['type']($name, $jsGridField['options'] ?? [], $field);
 
 			$fields[] = $jsGridFieldInstance;
 		}
 
 		if(!isset($fields[$this->getKeyName()])){
-			$fields[] = new JsGridText([
+			$fields[] = new JsGridText($this->getKeyName(), [
 					'visible' => false, 
 					'editing' => false, 
 					'filtering' => false
