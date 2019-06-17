@@ -23,7 +23,10 @@ const MediaField = (() => {
             },
 
             _createImage(value){
-                return $('<img src="'+value.image+'">');
+                return $('<img src="'+value+'">').click(function(){
+                    window.open(value);
+                    return false;
+                });
             }
         });
 
