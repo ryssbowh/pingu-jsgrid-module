@@ -3,6 +3,7 @@ import DatetimeField from './fields/datetime.js';
 import SelectField from './fields/select.js';
 import ModelSelectField from './fields/modelselect.js';
 import MediaField from './fields/media.js';
+import ArrayToString from './fields/arraytostring.js';
 import * as h from 'pingu-helpers';
 
 const JsGrid = (() => {
@@ -19,6 +20,7 @@ const JsGrid = (() => {
 			DatetimeField.init();
 			ModelSelectField.init();
 			MediaField.init();
+			ArrayToString.init();
 			options.jsgrid.on('jsgrid-error', function(e, action, data){
 				showErrors(data.responseJSON.message);
 			});
@@ -67,7 +69,6 @@ const JsGrid = (() => {
 			},
 			updateItem: function(item){
 				let url = replaceUriToken(jsOptions.ajaxUpdateUri, item);
-				delete item[jsOptions.primaryKey];
 				let d = $.Deferred();
 				h.put(url,item)
 					.done(function(data){

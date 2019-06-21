@@ -14,6 +14,7 @@ trait JsGridable {
 
     /**
 	 * Returns the name of this jsgrid instance
+	 * 
 	 * @param  string $model
 	 * @return string
 	 */
@@ -24,6 +25,7 @@ trait JsGridable {
 
 	/**
 	 * Builds field definitions for a jsgrid instance
+	 * 
 	 * @param  string $model
 	 * @param  array  $fields
 	 * @return array
@@ -31,7 +33,7 @@ trait JsGridable {
 	 */
 	public function buildJsGridFields()
 	{
-		$fieldsDef = $this->fieldDefinitions();
+		$fieldsDef = $this->getFieldDefinitions();
 		$jsGridFields = $this->jsGridFields();
 		$fields = [];
 

@@ -1,76 +1,55 @@
 <?php
 
-namespace Pingu\Jsgrid\Traits\Controllers;
+namespace Pingu\Jsgrid\Http\Controllers;
 
-use ContextualLinks,Notify;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
-use Pingu\Core\Entities\BaseModel;
+use Pingu\Core\Contracts\Models\HasAdminRoutesContract;
+use Pingu\Core\Exceptions\ControllerException;
+use Pingu\Core\Http\Controllers\ModelController;
+use Pingu\Forms\Contracts\Models\FormableContract;
 use Pingu\Jsgrid\Contracts\Models\JsGridableContract;
 use Pingu\Jsgrid\Events\JsGridOptionsBuilt;
-use Pingu\Jsgrid\Exceptions\JsGridException;
 
-trait JsGrid
+abstract class JsGridController extends ModelController
 {
-	/**
-	 * builds jsGrid options for a related jsGrid list view.
-	 * @param  JsGridableContract $model
-	 * @param  Request   $request
-	 * @param  array|null     $contextualLink 
-	 * @return array
-	 */
-	// protected function buildRelatedJsGridView(JsGridableContract $model, Request $request, ?array $contextualLink = null)
-	// {
-	// 	$extraOptions = [
-	// 		'relatedModel' => get_class($model),
-	// 		'relatedId' => $model->id,
-	// 		'contextualLink' => $request->route()->action['contextualLink']
-	// 	];
-
-	// 	$title = $model::friendlyName().'\'s '.str_plural($contextualLink['model']::friendlyName());
-	// 	$relatedModel = $contextualLink['model'];
-
-	// 	$options = $relatedModel::buildJsGridOptions();
-	// 	$options['ajaxUrl'] = $relatedModel::apiUrl();
-	// 	$options['editUrl'] = $relatedModel::adminEditUrl();
-		
-	// 	return [
-	// 		'title' => $title,
-	// 		'name' => $relatedModel::jsGridInstanceName(),
-	// 		'fields' => $relatedModel::buildJsGridFields(),
-	// 		'options' => json_encode($options),
-	// 		'extra' => json_encode($extraOptions ?? []),
-	// 		'addUrl' => $contextualLink['relatedAddUrl'] ?? $relatedModel::adminAddUrl()
-	// 	];
-	// }
+	public function __construct(Request $request)
+	{
+		$model = $this->getModel();
+		$model = new $model;
+		if(!($model instanceof JsGridableContract)){
+			throw ControllerException::modelMissingInterface($model, JsGridableContract::class);
+		}
+		if(!($model instanceof HasAdminRoutesContract)){
+			throw ControllerException::modelMissingInterface($model, HasAdminRoutesContract::class);
+		}
+		parent::__construct($request);
+	}
 	
 	public function jsGridIndex(Request $request)
 	{
-		$modelStr = $this->getModel();
-		$model = new $modelStr;
-
 		$filters = $request->input('filters', []);
 		$options = $request->input('options', []);
 		$pageIndex = $request->input('pageIndex', 1);
-		$pageSize = $request->input('pageSize', $model->getPerPage());
-		$sortField = $request->input('sortField', $model->getKeyName());
+		$pageSize = $request->input('pageSize', $this->model->getPerPage());
+		$sortField = $request->input('sortField', $this->model->getKeyName());
 		$sortOrder = $request->input('sortOrder', 'asc');
 
-		$fieldsDef = $model->getFieldDefinitions();
-		$query = $model->newQuery();
+		$fieldsDef = $this->model->getFieldDefinitions();
+		$fieldsDef = $this->modifyJsGridDefinition($fieldsDef);
+		$query = $this->model->newQuery();
 
 		foreach($filters as $field => $value){
 			if(!isset($fieldsDef[$field])){
 				//this field is not defined, it must be a field that doesn't exist in the model
-				//but still has a value for jsgrid (defined by its mutator)
+				//but still has a value for jsgrid (defined by its mutator).
+				//Since it doesn't exist in the model, we exclude it here :
 				continue;
 			}
 			$fieldDef = $fieldsDef[$field];
-			
-			if(!is_null($value)){
-				//we have a filter for that field, letting the field type doing its job :
-				$fieldDef->option('type')->filterQueryModifier($query, $field, $value);
-			}
+	
+			//we have a filter for that field, letting the field type doing its job :
+			$fieldDef->option('type')->filterQueryModifier($query, $field, $value);
 		}
 
 		$count = $query->count();
@@ -124,19 +103,14 @@ trait JsGrid
 	 */
 	protected function buildJsGridView(Request $request)
 	{
-		$model = $this->getModel();
-		$model = new $model;
-		if(!$model instanceof JsGridableContract){
-			throw new JsGridException($model." must implement JsGridableContract to use JsGrid");
-		}
 		$options = array_merge(config("jsgrid.jsGridDefaults"), $this->getJsGridOptions());
 		$controls = $this->controls();
-		$options['primaryKey'] = $model::keyName();
+		$options['primaryKey'] = $this->model::keyName();
 		$options['ajaxIndexUri'] = $this->getJsGridIndexUri();
 		$options['canClick'] = $this->canClick();
 		$options['editing'] = $controls['editButton'] = $this->canEdit();
 		$options['deleting'] = $controls['deleteButton'] = $this->canDelete();
-		$options['fields'] = $model->buildJsGridFields();
+		$options['fields'] = $this->model->buildJsGridFields();
 		$options['fields'][] = $controls;
 		if($this->canClick()){
 			$options['clickUrl'] = $this->getClickLink();
@@ -147,7 +121,7 @@ trait JsGrid
 		if($this->canDelete()){
 			$options['ajaxDeleteUri'] = $this->getJsGridDeleteUri();
 		}
-		$name = $model::jsGridInstanceName();
+		$name = $this->model::jsGridInstanceName();
 
 		$options = $this->modifyJsGridDefinition($options);
 
@@ -166,31 +140,13 @@ trait JsGrid
 
 	/**
 	 * returns jsgrid options for that instance of jsgrid
+	 * 
 	 * @return array
 	 */
 	protected function getJsGridOptions()
 	{
 		return [];
 	}
-
-	/**
-	 * Builds a jsGrid for a related object
-	 * @param  Request   $request
-	 * @param  JsGridableContract $model
-	 * @return view
-	 */
-	// protected function relatedJsGridList(Request $request, JsGridableContract $model)
-	// {
-	// 	if(!isset($request->route()->action['contextualLink'])) throw new Exception('contextualLink is not set for that route');
-	// 	$contextualLink = $request->route()->action['contextualLink'];
-
-	// 	$contextualLinks = $model->getContextualLinks();
-	// 	if(!isset($contextualLinks[$contextualLink])) throw new Exception('contextual link '.$contextualLink.' doesn\'t exist for '.get_class($model));
-	// 	$contextualLink = $contextualLinks[$contextualLink];
-	// 	ContextualLinks::addLinks($contextualLinks);
-	// 	$options = $this->buildRelatedJsGridView($model, $request, $contextualLink);
-	// 	return view('jsgrid::list')->with($options);
-	// }
 
 	/**
 	 * Replace the route slug in the uri with the primary key
@@ -201,9 +157,8 @@ trait JsGrid
 	protected function replaceUriTokens(string $uri)
 	{
 		if(is_null($uri)) return null;
-		$model = $this->getModel();
-		$slug = $model::routeSlug();
-		$key = (new $model)->getRouteKeyName();
+		$slug = $this->model::routeSlug();
+		$key = $this->model->getRouteKeyName();
 
 		preg_match('/^.*\{('.$slug.')\}.*$/', $uri, $matches);
         if($matches){
@@ -221,7 +176,7 @@ trait JsGrid
 	 */
 	protected function getJsGridIndexUri()
 	{
-		return $this->getModel()::getAjaxUri('index', true);
+		return $this->model::getAjaxUri('index', true);
 	}
 
 	/**
@@ -231,7 +186,7 @@ trait JsGrid
 	 */
 	protected function getJsGridDeleteUri()
 	{
-		return $this->replaceUriTokens($this->getModel()::getAjaxUri('delete', true));
+		return $this->replaceUriTokens($this->model::getAjaxUri('delete', true));
 	}
 
 	/**
@@ -241,7 +196,7 @@ trait JsGrid
 	 */
 	protected function getJsGridUpdateUri()
 	{
-		return $this->replaceUriTokens($this->getModel()::getAjaxUri('update', true));
+		return $this->replaceUriTokens($this->model::getAjaxUri('update', true));
 	}
 
 	/**
@@ -251,7 +206,18 @@ trait JsGrid
 	 */
 	protected function getClickLink()
 	{
-		return $this->replaceUriTokens($this->getModel()::getAdminUri('edit', true));
+		return $this->replaceUriTokens($this->model::getAdminUri('edit', true));
+	}
+
+	/**
+	 * JsGrid controls for that instance of jsgrid
+	 *
+	 * @see http://js-grid.com/docs/#control
+	 * @return array
+	 */
+	protected function controls()
+	{
+		return ['type' => 'control'];
 	}
 
 	/**
@@ -259,39 +225,20 @@ trait JsGrid
 	 * 
 	 * @return bool
 	 */
-	protected function canClick()
-	{
-		return false;
-	}
+	abstract protected function canClick();
 
 	/**
 	 * Can the user edit objects
 	 * 
 	 * @return bool
 	 */
-	protected function canEdit()
-	{
-		return false;
-	}
+	abstract protected function canEdit();
 
 	/**
 	 * Can the user delete objects
 	 * 
 	 * @return bool
 	 */
-	protected function canDelete()
-	{
-		return false;
-	}
-
-	/**
-	 * JsGrid controls for that instance of jsgrid
-	 * 
-	 * @return array
-	 */
-	protected function controls()
-	{
-		return ['type' => 'control'];
-	}
+	abstract protected function canDelete();
 
 }

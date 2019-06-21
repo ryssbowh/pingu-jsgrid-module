@@ -13,6 +13,9 @@ const MediaField = (() => {
         field.prototype = new jsGrid.TextField({
 
             css: "media-field",
+            filtering: false,
+            sorting: false,
+            editing: false,
          
             itemTemplate: function(value) {
                 return this._createImage(value);
