@@ -3,7 +3,7 @@
     "alias": "jsgrid",
     "description": "",
     "keywords": [],
-    "active": 1,
+    "active": 0,
     "order": 2,
     "providers": [
         "Pingu\\Jsgrid\\Providers\\JsGridServiceProvider"
