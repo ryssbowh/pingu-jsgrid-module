@@ -4,6 +4,11 @@
 - [ ] test thoroughly all fields
 - [ ] Make model fields lazyload them
 
+## v2.0.0
+- added ArrayToString field
+- added Media field
+- 
+
 ## v1.1.3
 - added checkbox field
 - renamed Contracts/Traits

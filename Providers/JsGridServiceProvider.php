@@ -2,11 +2,12 @@
 
 namespace Pingu\Jsgrid\Providers;
 
-use Illuminate\Support\ServiceProvider;
-use Illuminate\Database\Eloquent\Factory;
 use Asset;
+use Illuminate\Database\Eloquent\Factory;
+use Pingu\Core\Support\ModuleServiceProvider;
+use Pingu\JsGrid\JsGrid;
 
-class JsGridServiceProvider extends ServiceProvider
+class JsGridServiceProvider extends ModuleServiceProvider
 {
     /**
      * Indicates if loading of the provider is deferred.
@@ -37,7 +38,7 @@ class JsGridServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+        
     }
 
     /**
@@ -47,9 +48,6 @@ class JsGridServiceProvider extends ServiceProvider
      */
     protected function registerConfig()
     {
-        $this->publishes([
-            __DIR__.'/../Config/config.php' => config_path('jsgrid.php'),
-        ], 'config');
         $this->mergeConfigFrom(
             __DIR__.'/../Config/config.php', 'jsgrid'
         );
@@ -57,8 +55,8 @@ class JsGridServiceProvider extends ServiceProvider
 
     public function registerAssets()
     {
-        Asset::container('modules')->add('jsgrid-js', 'modules/Jsgrid/js/Jsgrid.js');
-        Asset::container('modules')->add('jsgrid-css', 'modules/Jsgrid/css/Jsgrid.css');
+        Asset::container('modules')->add('jsgrid-js', 'module-assets/Jsgrid.js');
+        Asset::container('modules')->add('jsgrid-css', 'module-assets/Jsgrid.css');
     }
 
     /**

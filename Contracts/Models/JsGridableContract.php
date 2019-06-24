@@ -2,21 +2,25 @@
 namespace Pingu\Jsgrid\Contracts\Models;
 
 use Pingu\Core\Contracts\Models\HasAjaxRoutesContract;
-use Pingu\Forms\Contracts\FormableContract;
+use Pingu\Forms\Contracts\Models\FormableContract;
 
 
 interface JsGridableContract extends HasAjaxRoutesContract, FormableContract
 {
 
 	/**
-	 * List of fields displayed in jsGrid
+	 * List of fields displayed in jsGrid, that can also define fields that
+	 * don't exists in the model, in which case an accessor will be called
+	 * eg : getJsGridImageField for the field 'image'
+	 * 
 	 * @return array
 	 * @see  http://js-grid.com/docs/#grid-fields
 	 */
-    public static function jsGridFields();
+    public function jsGridFields();
 
     /**
 	 * Returns the name of this jsgrid instance
+	 * 
 	 * @param  string $model
 	 * @return string
 	 */

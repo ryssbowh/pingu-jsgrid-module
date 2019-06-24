@@ -1,6 +1,6 @@
 
 
-const ModelField = (() => {
+const ModelSelectField = (() => {
 
     function init(){
 
@@ -51,7 +51,7 @@ const ModelField = (() => {
             itemTemplate: function(value) {
                 var items = this.items,
                     valueField = this.valueField,
-                    textField = Array.isArray(this.textField) ? this.textField : [this.textField],
+                    textField = this.options.textField,
                     me = this,
                     separator = this.separator,
                     result;
@@ -122,7 +122,7 @@ const ModelField = (() => {
             }
         });
 
-        jsGrid.fields.model = jsGrid.ModelField = field;
+        jsGrid.fields.modelselect = jsGrid.ModelSelectField = field;
 
     };
 
@@ -132,4 +132,4 @@ const ModelField = (() => {
 
 })();
 
-export default ModelField;
+export default ModelSelectField;
