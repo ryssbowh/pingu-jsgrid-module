@@ -1,6 +1,7 @@
 {
     "devDependencies": {
-        "jsgrid": "^1.5.3"
     },
-    "dependencies": {}
+    "dependencies": {
+    	"jsgrid": "^1.5.3"
+    }
 }
