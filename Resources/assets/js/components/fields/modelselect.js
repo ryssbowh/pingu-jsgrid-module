@@ -29,7 +29,7 @@ const ModelSelectField = (() => {
                     return "";
 
                 var grid = this._grid,
-                    $result = this.filterControl = this._createSelect();
+                    $result = this.filterControl = this._createSelect(true);
 
                 $result.prepend('<option value="">All</option>');
                 $result.prop('multiple', false);
@@ -89,7 +89,7 @@ const ModelSelectField = (() => {
                 if(!this.editing)
                     return this.itemTemplate.apply(this, arguments);
 
-                var $result = this.editControl = this._createSelect();
+                var $result = this.editControl = this._createSelect(false);
                 if(this.multiple){
                     value = $.map(value, function(elem,ind){
                         return elem[valueField];
@@ -102,10 +102,13 @@ const ModelSelectField = (() => {
                 return $result;
             },
 
-            _createSelect: function() {
+            _createSelect: function(removeNovalue) {
                 var $result = $("<select>");
 
                 for(var property in this.items){
+                    if(property == '' && removeNovalue){
+                        continue;
+                    }
                     var $option = $("<option>")
                         .attr("value", property)
                         .text(this.items[property])

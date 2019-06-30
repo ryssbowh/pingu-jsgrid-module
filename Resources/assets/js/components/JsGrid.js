@@ -1,10 +1,6 @@
 import jsGrid from 'jsgrid';
 import DatetimeField from './fields/datetime.js';
 import SelectField from './fields/select.js';
-import ModelSelectField from './fields/modelselect.js';
-import MediaField from './fields/media.js';
-import ArrayToString from './fields/arraytostring.js';
-import * as h from 'pingu-helpers';
 
 const JsGrid = (() => {
 
@@ -12,15 +8,13 @@ const JsGrid = (() => {
 		jsgrid: $('.jsgrid-table'),
 	};
 
-	function init(){ 
-		console.log('JsGrid initialized');
+	let jsOptions;
 
+	function init(){ 
 		if(options.jsgrid.length){
+			console.log('JsGrid initialized');
 			SelectField.init();
 			DatetimeField.init();
-			ModelSelectField.init();
-			MediaField.init();
-			ArrayToString.init();
 			options.jsgrid.on('jsgrid-error', function(e, action, data){
 				showErrors(data.responseJSON.message);
 			});
@@ -28,75 +22,52 @@ const JsGrid = (() => {
 		}
 	};
 
-	function reorganizeFilters(filters){
-		let data = {
-			pageIndex: filters.pageIndex,
-			pageSize: filters.pageSize,
-			sortField: filters.sortField,
-			sortOrder: filters.sortOrder
-		};
-		delete filters.pageIndex;
-		delete filters.pageSize;
-		delete filters.sortField;
-		delete filters.sortOrder;
-		data.filters = filters;
-		return data;
-	}
-
 	function initJsGrid(){
-		let jsOptions = options.jsgrid.data('options');
+		jsOptions = options.jsgrid.data('options');
 
-		jsOptions.rowClick = function(params){
-			if(jsOptions.canClick){
-				window.location.href = replaceUriToken(jsOptions.clickUrl, params.item);
-			}
-		};
+		// jsOptions.rowClick = function(params){
+		// 	if(jsOptions.canClick){
+		// 		window.location.href = replaceUriToken(jsOptions.clickUrl, params.item);
+		// 	}
+		// };
+	
 
 		jsOptions.controller = {
-			loadData: function(filters){
-				let d = $.Deferred();
-				filters = reorganizeFilters(filters);
-				h.get(jsOptions.ajaxIndexUri, filters)
-					.done(function(data){
-			        	$('.jsgrid-total').html(data.total);
-			        	$('.jsgrid-total').parent().show();
-			        	d.resolve({data:data.models});
-		        	}).fail(function(data){
-		        		options.jsgrid.trigger('jsgrid-error', ['load', data]);
-		        		d.reject();
-		        	});
-		        return d.promise();
-			},
-			updateItem: function(item){
-				let url = replaceUriToken(jsOptions.ajaxUpdateUri, item);
-				let d = $.Deferred();
-				h.put(url,item)
-					.done(function(data){
-						d.resolve(data.model);
-					})
-					.fail(function(data){
-		        		options.jsgrid.trigger('jsgrid-error', ['update', data, item]);
-		        		d.reject();
-		        	});
-		        return d.promise();
-			},
-			deleteItem: function(item){
-				let url = replaceUriToken(jsOptions.ajaxDeleteUri, item);
-				return h._delete(url)
-					.fail(function(data){
-		        		options.jsgrid.trigger('jsgrid-error', ['delete', data, item]);
-		        	});
-			}
-		};
+            loadData: function(filter) {
+                var startIndex = (filter.pageIndex - 1) * filter.pageSize;
+                var data = $.grep(jsOptions.data, function(item){
+                	let keep = true;
+                	$.each(jsOptions.fields, function(i,field){
+                		if(field.type == 'text' && filter[field.name] && item[field.name].indexOf(filter[field.name]) < 0){
+                			keep = false;
+                			return false;
+                		}
+                		if(field.type == 'select' && filter[field.name]){
+                			if(item[field.name] != filter[field.name]){
+                				keep = false;
+                				return false;
+                			}
+                		}
+                	});
+                	return keep;
+                });
+                if(filter.sortField){
+	                data = data.sort(function(a, b){
+	                	if(filter.sortOrder == 'desc'){
+	                		return a[filter.sortField] > b[filter.sortField];
+	                	}
+	                	return a[filter.sortField] <= b[filter.sortField];
+	                });
+	            }
+                return {
+                    data: data.slice(startIndex, startIndex + filter.pageSize),
+                    itemsCount: data.length
+                };
+            }
+        };
 
 		options.jsgrid.jsGrid(jsOptions);
 	};
-
-	function replaceUriToken(url, item){
-		let match = url.match(/^.*\{([a-zA-Z0-9\-_]+)\}.*$/);
-		return url.replace('{'+match[1]+'}',item[match[1]]);
-
-	}
 
 	function showErrors(message){
 		alert(message);

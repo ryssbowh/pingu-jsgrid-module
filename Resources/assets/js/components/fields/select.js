@@ -34,7 +34,7 @@ const SelectField = (() => {
 		            valueField = this.valueField,
 		            textField = this.textField,
 		            resultItem;
-
+		        
 		        if(valueField) {
 		            resultItem = $.grep(items, function(item, index) {
 		                return item[valueField] === value;
@@ -44,7 +44,7 @@ const SelectField = (() => {
 		            resultItem = items[value];
 		        }
 
-		        var result = (textField ? resultItem[textField] : resultItem);
+		        var result = (textField ? resultItem[0][textField] : resultItem);
 
 		        return (result === undefined || result === null) ? "" : result;
 		    },

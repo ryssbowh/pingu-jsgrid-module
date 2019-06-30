@@ -1,7 +1,7 @@
 {
     "name": "Jsgrid",
     "alias": "jsgrid",
-    "description": "",
+    "description": "JsGrid integration",
     "keywords": [],
     "active": 1,
     "order": 2,
@@ -9,7 +9,7 @@
         "Pingu\\Jsgrid\\Providers\\JsGridServiceProvider"
     ],
     "aliases": {
-        "JsGrid" : "Pingu\\Jsgrid\\JsGrid"
+        "JsGrid": "Pingu\\Jsgrid\\JsGrid"
     },
     "files": [
         "start.php"

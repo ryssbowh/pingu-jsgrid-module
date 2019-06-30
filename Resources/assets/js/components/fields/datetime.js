@@ -7,7 +7,7 @@ const DatetimeField = (() => {
         var TextField = jsGrid.TextField;
 
         function field(config) {
-
+            this.format = config.format ? config.format : 'YYYY-MM-DD HH:mm:ss';
             TextField.call(this, config);
 
         }
@@ -15,23 +15,21 @@ const DatetimeField = (() => {
         field.prototype = new jsGrid.TextField({
 
             css: "datetime-field",
-            format: (this.format ? this.format : 'YYYY-MM-DD HH:mm:ss'),
          
             sorter: function(date1, date2) {
                 return moment(date1) - moment(date2);
             },
          
             itemTemplate: function(value) {
-                return moment(value).format(this.format);
+                return moment(value.date).format(this.format);
             },
          
             editTemplate: function(value) {
-                this._picker = $('<div class="input-group date" id="datetimepicker1" data-target-input="nearest"><input type="text" class="form-control datetimepicker-input" data-target="#datetimepicker1" value="'+value+'"/><div class="input-group-append" data-target="#datetimepicker1" data-toggle="datetimepicker"><div class="input-group-text"><i class="fa fa-calendar"></i></div></div></div>');
                 if(!this.editing){
                     return this.itemTemplate(value);
                 }
 
-                this._picker = this._createInput('datetimepickerEdit'+this.name, 'Date', value);
+                this._picker = this._createInput('datetimepicker'+this.name, 'Date', value.date);
 
                 this._picker.datetimepicker({
                     format: this.format,
@@ -47,21 +45,38 @@ const DatetimeField = (() => {
                 var grid = this._grid,
                     $result = $('<div>');
 
-                var from = this.filterControlFrom = this._createInput('datetimepicker'+this.name, 'From','').appendTo($result);
-                // var $to = this.filterControlTo = this._createInput('to', 'To').appendTo($result);
+                var from = this.filterControlFrom = this._createInput('datetimepickerFrom'+this.name, 'From','').appendTo($result);
+                var to = this.filterControlTo = this._createInput('datetimepickerTo'+this.name, 'To','').appendTo($result);
 
-                $('#datetimepicker'+this.name).datetimepicker({
-                    format: 'YYYY MM DD HH:mm:ss',
-                    defaultDate: moment(),
-                    allowInputToggle:true
+                from.datetimepicker({
+                    format: this.format,
+                    allowInputToggle: true,
+                    sideBySide: true
                 });
+                to.datetimepicker({
+                    format: this.format,
+                    allowInputToggle: true,
+                    sideBySide: true
+                });
+
+                if(this.autosearch) {
+                    let grid = this._grid;
+                    to.on("change.datetimepicker", function(e) {
+                        grid.search();
+                    });
+                    from.on("change.datetimepicker", function(e) {
+                        grid.search();
+                    });
+                }
 
                 return $result;
             },
 
             filterValue: function() {
-                // console.log(this.filterControlFrom.find('input').val());
-                //return this.filterControl.val();
+                return {
+                    from: this.filterControlFrom.find('input.datetimepicker-input').val(),
+                    to: this.filterControlTo.find('input.datetimepicker-input').val()
+                };
             },
 
             _createInput(name, placeholder,value){
