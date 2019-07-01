@@ -1,6 +1,7 @@
 import jsGrid from 'jsgrid';
 import DatetimeField from './fields/datetime.js';
 import SelectField from './fields/select.js';
+import * as h from 'PinguHelpers';
 
 const JsGrid = (() => {
 
@@ -12,7 +13,7 @@ const JsGrid = (() => {
 
 	function init(){ 
 		if(options.jsgrid.length){
-			console.log('JsGrid initialized');
+			h.log('JsGrid initialized');
 			SelectField.init();
 			DatetimeField.init();
 			options.jsgrid.on('jsgrid-error', function(e, action, data){

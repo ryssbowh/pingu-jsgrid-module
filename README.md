@@ -4,36 +4,25 @@
 - [ ] test thoroughly all fields
 - [ ] Make model fields lazyload them
 
-## v2.0.0
-- added ArrayToString field
-- added Media field
-- 
-
-## v1.1.3
-- added checkbox field
-- renamed Contracts/Traits
-- added doc
-
-## v1.1.2
-- renamed api in ajax
-
-## v1.1
-- Refactored controllers to make it more reusable
-- integration to route slugs routes in api
-
-## v1.0.5 wrote readme
-
 ### JsGrid
 
-This module is used to make a model list page to be rendered as a [Js grid](http://js-grid.com/) list.
+This module is an integration with [Js grid](http://js-grid.com/).
 
-It provides with a controller to list a model, fields to define fields as jsgrid accepts them and js assets.
+### Models
+
+Provides with a controller to list a model, fields to define fields as jsgrid accepts them and js assets.
 
 To make a model JsGridable it'll need to implement `JsGridableContract` and use the `JsGridable` trait. this trait defines `jsGridFields()` that will need to be overriden to add fields to the view. each field in this array must have a type, which is one of the Field classname.
 
 You can't use jsGrid if your model is not Formable, therefore a model that implements `JsGridableContract` automatically implements `FormableContract` and must therefore use the traits associated with that contract.
 
 JsGrid is ajax driven and use the api framework as defined in Core, therefore a model that implements `JsGridableModel` automatically implements `AjaxableModel` and must therefore use the traits associated with that contract.
+
+If you need to display a model through jsgrid in a controller, it needs to extend `JsGridModelController`
+
+### static
+
+Provides a very simple integration to a static jsgrid (where all the data is loaded before), through the controller `JsGridController`.
 
 ### Assets
 If you can't find in the Resources/assets/js/components/fields folder the field you have defined, it means it uses the default js code that jsgrid provides.

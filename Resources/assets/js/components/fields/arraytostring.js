@@ -32,7 +32,6 @@ const ArrayToStringField = (() => {
 	        },
 
 	        itemTemplate: function(value) {
-	        	console.log(value);
                 return value.join(',');
             },
 

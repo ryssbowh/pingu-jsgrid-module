@@ -4,7 +4,7 @@ import SelectField from './fields/select.js';
 import ModelSelectField from './fields/modelselect.js';
 import MediaField from './fields/media.js';
 import ArrayToString from './fields/arraytostring.js';
-import * as h from 'pingu-helpers';
+import * as h from 'PinguHelpers';
 
 const JsGridModel = (() => {
 
@@ -16,7 +16,7 @@ const JsGridModel = (() => {
 
 	function init(){ 
 		if(options.jsgrid.length){
-			console.log('JsGridModel initialized');
+			h.log('JsGridModel initialized');
 			SelectField.init();
 			DatetimeField.init();
 			ModelSelectField.init();
@@ -57,7 +57,6 @@ const JsGridModel = (() => {
 			loadData: function(filters){
 				let d = $.Deferred();
 				filters = reorganizeFilters(filters);
-				console.log(filters);
 				h.get(jsOptions.ajaxIndexUri, filters)
 					.done(function(data){
 			        	$('.jsgrid-total').html(data.total);
