@@ -3,7 +3,6 @@
     "alias": "jsgrid",
     "description": "JsGrid integration",
     "keywords": [],
-    "active": 1,
     "order": 2,
     "providers": [
         "Pingu\\Jsgrid\\Providers\\JsGridServiceProvider"
