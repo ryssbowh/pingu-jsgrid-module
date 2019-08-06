@@ -4,6 +4,7 @@
     "description": "JsGrid integration",
     "keywords": [],
     "order": 2,
+    "core": 1,
     "providers": [
         "Pingu\\Jsgrid\\Providers\\JsGridServiceProvider"
     ],
