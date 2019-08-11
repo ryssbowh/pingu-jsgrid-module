@@ -4,8 +4,8 @@ namespace Pingu\Jsgrid\Http\Controllers;
 
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
-use Pingu\Core\Contracts\Models\HasAdminRoutesContract;
-use Pingu\Core\Exceptions\ControllerException;
+use Pingu\Core\Contracts\Models\HasCrudUrisContract;
+use Pingu\Core\Exceptions\ClassException;
 use Pingu\Core\Http\Controllers\ModelController;
 use Pingu\Forms\Contracts\Models\FormableContract;
 use Pingu\Jsgrid\Contracts\Models\JsGridableContract;
@@ -15,13 +15,13 @@ abstract class JsGridModelController extends ModelController
 {
 	public function __construct(Request $request)
 	{
-		$model = $this->getModel();
-		$model = new $model;
+		$modelStr = $this->getModel();
+		$model = new $modelStr;
 		if(!($model instanceof JsGridableContract)){
-			throw ControllerException::modelMissingInterface($model, JsGridableContract::class);
+			throw ClassException::missingInterface($modelStr, JsGridableContract::class);
 		}
-		if(!($model instanceof HasAdminRoutesContract)){
-			throw ControllerException::modelMissingInterface($model, HasAdminRoutesContract::class);
+		if(!($model instanceof HasCrudUrisContract)){
+			throw ClassException::missingInterface($modelStr, HasCrudUrisContract::class);
 		}
 		parent::__construct($request);
 	}
@@ -177,7 +177,7 @@ abstract class JsGridModelController extends ModelController
 	 */
 	protected function getJsGridIndexUri()
 	{
-		return $this->model::getAjaxUri('index', true);
+		return $this->model::getUri('index', config('core.ajaxPrefix'));
 	}
 
 	/**
@@ -187,7 +187,7 @@ abstract class JsGridModelController extends ModelController
 	 */
 	protected function getJsGridDeleteUri()
 	{
-		return $this->replaceUriTokens($this->model::getAjaxUri('delete', true));
+		return $this->replaceUriTokens($this->model::getUri('delete', config('core.ajaxPrefix')));
 	}
 
 	/**
@@ -197,7 +197,7 @@ abstract class JsGridModelController extends ModelController
 	 */
 	protected function getJsGridUpdateUri()
 	{
-		return $this->replaceUriTokens($this->model::getAjaxUri('update', true));
+		return $this->replaceUriTokens($this->model::getUri('update', config('core.ajaxPrefix')));
 	}
 
 	/**
@@ -207,7 +207,7 @@ abstract class JsGridModelController extends ModelController
 	 */
 	protected function getClickLink()
 	{
-		return $this->replaceUriTokens($this->model::getAdminUri('edit', true));
+		return $this->replaceUriTokens($this->model::getUri('edit', config('core.adminPrefix')));
 	}
 
 	/**

@@ -28,7 +28,6 @@ class JsGridServiceProvider extends ModuleServiceProvider
         $this->registerFactories();
         $this->registerAssets();
         $this->loadViewsFrom(__DIR__ . '/../Resources/views', 'jsgrid');
-        $this->loadMigrationsFrom(__DIR__ . '/../Database/Migrations');
     }
 
     /**
