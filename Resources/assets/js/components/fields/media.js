@@ -26,8 +26,15 @@ const MediaField = (() => {
             },
 
             _createImage(value){
-                return $('<img src="'+value+'">').click(function(){
-                    window.open(value);
+                if(!value) return '';
+                let icon = value;
+                let link = value;
+                if(typeof value === 'object'){
+                    icon = value.icon;
+                    link = value.media;
+                }
+                return $('<img src="'+icon+'">').click(function(){
+                    window.open(link);
                     return false;
                 });
             }

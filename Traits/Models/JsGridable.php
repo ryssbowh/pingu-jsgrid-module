@@ -1,6 +1,7 @@
 <?php 
 namespace Pingu\Jsgrid\Traits\Models;
 
+use Pingu\Forms\Exceptions\FormFieldException;
 use Pingu\Forms\Support\Field;
 use Pingu\Forms\Support\Fields\TextInput;
 use Pingu\Forms\Support\Types\Integer;
@@ -68,4 +69,20 @@ trait JsGridable {
 			return $field->toArray();
 		}, $fields);
 	}
+
+	/**
+     * Helper to build a field class from a field name
+     * 
+     * @param  string $name
+     * @return Field
+     */
+    public function buildFieldClass(string $name)
+    {
+        $fields = $this->fieldDefinitions();
+        if(!isset($fields[$name])){
+            throw FormFieldException::notDefinedInModel($name, get_class($this));
+        }
+        
+        return Field::buildFieldClass($name, $fields[$name]);
+    }
 }

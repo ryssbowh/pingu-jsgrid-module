@@ -1,6 +1,10 @@
 import jsGrid from 'jsgrid';
 import DatetimeField from './fields/datetime.js';
 import SelectField from './fields/select.js';
+import ModelSelectField from './fields/modelselect.js';
+import MediaField from './fields/media.js';
+import ArrayToString from './fields/arraytostring.js';
+import FileSizeField from './fields/filesize.js';
 import * as h from 'PinguHelpers';
 
 const JsGrid = (() => {
@@ -14,24 +18,23 @@ const JsGrid = (() => {
 	function init(){ 
 		if(options.jsgrid.length){
 			h.log('JsGrid initialized');
-			SelectField.init();
-			DatetimeField.init();
-			options.jsgrid.on('jsgrid-error', function(e, action, data){
-				showErrors(data.responseJSON.message);
-			});
+			initFields();
 			initJsGrid();
 		}
 	};
 
+	function initFields()
+	{
+		SelectField.init();
+		DatetimeField.init();
+		ModelSelectField.init();
+		MediaField.init();
+		ArrayToString.init();
+		FileSizeField.init();
+	}
+
 	function initJsGrid(){
 		jsOptions = options.jsgrid.data('options');
-
-		// jsOptions.rowClick = function(params){
-		// 	if(jsOptions.canClick){
-		// 		window.location.href = replaceUriToken(jsOptions.clickUrl, params.item);
-		// 	}
-		// };
-	
 
 		jsOptions.controller = {
             loadData: function(filter) {
@@ -70,13 +73,9 @@ const JsGrid = (() => {
 		options.jsgrid.jsGrid(jsOptions);
 	};
 
-	function showErrors(message){
-		alert(message);
-	}
-
 	return {
 		init: init,
-		showErrors: showErrors
+		initFields: initFields
 	};
 
 })();

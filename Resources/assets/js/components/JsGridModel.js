@@ -1,9 +1,6 @@
 import jsGrid from 'jsgrid';
-import DatetimeField from './fields/datetime.js';
-import SelectField from './fields/select.js';
-import ModelSelectField from './fields/modelselect.js';
-import MediaField from './fields/media.js';
-import ArrayToString from './fields/arraytostring.js';
+import jsGridBase from './JsGrid';
+
 import * as h from 'PinguHelpers';
 
 const JsGridModel = (() => {
@@ -16,15 +13,7 @@ const JsGridModel = (() => {
 
 	function init(){ 
 		if(options.jsgrid.length){
-			h.log('JsGridModel initialized');
-			SelectField.init();
-			DatetimeField.init();
-			ModelSelectField.init();
-			MediaField.init();
-			ArrayToString.init();
-			options.jsgrid.on('jsgrid-error', function(e, action, data){
-				showErrors(data.responseJSON.message);
-			});
+			jsGridBase.initFields();
 			initJsGrid();
 		}
 	};
@@ -42,6 +31,17 @@ const JsGridModel = (() => {
 		delete filters.sortOrder;
 		data.filters = {...filters, ...jsOptions.extraFilters};
 		return data;
+	}
+
+	function removeNonEditableFields(item)
+	{
+		var value = {};
+		Object.keys(item).forEach(function(name){
+			if(options.jsgrid.jsGrid('fieldOption', name, 'editing')){
+				value.name = item.name
+			}
+		});
+		return value;
 	}
 
 	function initJsGrid(){
@@ -68,9 +68,10 @@ const JsGridModel = (() => {
 		        	});
 		        return d.promise();
 			},
-			updateItem: function(item){
+			updateItem: function(item, test){
 				let url = replaceUriToken(jsOptions.ajaxUpdateUri, item);
 				let d = $.Deferred();
+				item = removeNonEditableFields(item);
 				h.put(url,item)
 					.done(function(data){
 						d.resolve(data.model);
@@ -99,13 +100,8 @@ const JsGridModel = (() => {
 
 	}
 
-	function showErrors(message){
-		alert(message);
-	}
-
 	return {
-		init: init,
-		showErrors: showErrors
+		init: init
 	};
 
 })();

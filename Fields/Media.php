@@ -1,6 +1,8 @@
 <?php
 namespace Pingu\Jsgrid\Fields;
 
+use Pingu\Forms\Support\Field;
+
 class Media extends JsGridField
 {
 	public function __construct(string $name, array $options, ?Field $field)

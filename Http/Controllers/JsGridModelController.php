@@ -49,7 +49,7 @@ abstract class JsGridModelController extends ModelController
 			$fieldDef = $fieldsDef[$field];
 	
 			//we have a filter for that field, letting the field type doing its job :
-			$fieldDef->option('type')->filterQueryModifier($query, $field, $value);
+			$fieldDef->option('type')->filterQueryModifier($query, $value);
 		}
 
 		$count = $query->count();
@@ -66,34 +66,14 @@ abstract class JsGridModelController extends ModelController
 	}
 
 	/**
-	 * build the response. Each model field will be populated by either
-	 * the model attribute or the mutator for jsgrid (getJsGridImageField for field image)
+	 * build the response.
 	 * 
 	 * @param  Collection $models
 	 * @return array
 	 */
 	protected function jsGridModels(Collection $models)
 	{
-		if($models->isEmpty()) return [];
-		$out = [];
-		$fields = $models->first()->jsGridFields();
-		foreach($models as $index => $model){
-			$array = [
-				$model->getKeyName() => $model->getKey()
-			];
-			if($model->getRouteKeyName() != $model->getKeyName()){
-				$array[$model->getRouteKeyName()] = $model->getRouteKey();
-			}
-			foreach($fields as $field => $definition){
-				$method = 'getJsGrid'.ucfirst($field).'Field';
-				if(method_exists($model, $method)){
-					$array[$field] = $model->$method();
-				}
-				else $array[$field] = $model->$field;
-			}
-			$out[] = $array;
-		}
-		return $out;
+		return $models->toArray();
 	}
 
 	/**
@@ -177,7 +157,7 @@ abstract class JsGridModelController extends ModelController
 	 */
 	protected function getJsGridIndexUri()
 	{
-		return $this->model::getUri('index', config('core.ajaxPrefix'));
+		return $this->model::getUri('index', ajaxPrefix());
 	}
 
 	/**
@@ -187,7 +167,7 @@ abstract class JsGridModelController extends ModelController
 	 */
 	protected function getJsGridDeleteUri()
 	{
-		return $this->replaceUriTokens($this->model::getUri('delete', config('core.ajaxPrefix')));
+		return $this->replaceUriTokens($this->model::getUri('delete', ajaxPrefix()));
 	}
 
 	/**
@@ -197,7 +177,7 @@ abstract class JsGridModelController extends ModelController
 	 */
 	protected function getJsGridUpdateUri()
 	{
-		return $this->replaceUriTokens($this->model::getUri('update', config('core.ajaxPrefix')));
+		return $this->replaceUriTokens($this->model::getUri('update', ajaxPrefix()));
 	}
 
 	/**
@@ -207,7 +187,7 @@ abstract class JsGridModelController extends ModelController
 	 */
 	protected function getClickLink()
 	{
-		return $this->replaceUriTokens($this->model::getUri('edit', config('core.adminPrefix')));
+		return $this->replaceUriTokens($this->model::getUri('edit', adminPrefix()));
 	}
 
 	/**
