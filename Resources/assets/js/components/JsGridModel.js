@@ -35,13 +35,20 @@ const JsGridModel = (() => {
 
 	function removeNonEditableFields(item)
 	{
-		var value = {};
 		Object.keys(item).forEach(function(name){
-			if(options.jsgrid.jsGrid('fieldOption', name, 'editing')){
-				value.name = item.name
+			try{
+				if(!options.jsgrid.jsGrid('fieldOption', name, 'editing')){
+					delete item[name];
+				}
+				else if(!options.jsgrid.jsGrid('fieldOption', name, 'visible')){
+					delete item[name];
+				}
+			}
+			catch(error){
+				delete item[name];
 			}
 		});
-		return value;
+		return item;
 	}
 
 	function initJsGrid(){
@@ -68,7 +75,7 @@ const JsGridModel = (() => {
 		        	});
 		        return d.promise();
 			},
-			updateItem: function(item, test){
+			updateItem: function(item){
 				let url = replaceUriToken(jsOptions.ajaxUpdateUri, item);
 				let d = $.Deferred();
 				item = removeNonEditableFields(item);

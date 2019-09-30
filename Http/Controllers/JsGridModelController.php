@@ -35,7 +35,7 @@ abstract class JsGridModelController extends ModelController
 		$sortField = $request->input('sortField', $this->model->getKeyName());
 		$sortOrder = $request->input('sortOrder', 'asc');
 
-		$fieldsDef = $this->model->getFieldDefinitions();
+		$fieldsDef = $this->model->buildFieldDefinitions();
 		$fieldsDef = $this->modifyJsGridDefinition($fieldsDef);
 		$query = $this->model->newQuery();
 

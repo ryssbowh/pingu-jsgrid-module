@@ -34,7 +34,7 @@ trait JsGridable {
 	 */
 	public function buildJsGridFields()
 	{
-		$fieldsDef = $this->getFieldDefinitions();
+		$fieldsDef = $this->buildFieldDefinitions();
 		$jsGridFields = $this->jsGridFields();
 		$fields = [];
 
@@ -42,8 +42,14 @@ trait JsGridable {
 			//Silently assigning a default text type
 			if(!isset($jsGridField['type'])) $jsGridField['type'] = JsGridText::class;
 
-			$field = null;
-			if(isset($fieldsDef[$name])){
+			if(!isset($fieldsDef[$name])){
+				throw FormFieldException::notDefinedInModel($name, get_class($this));
+			}
+			$isBundle = (isset($jsGridField['bundle']) and $jsGridField['bundle']);
+			if($isBundle){
+				$field = $this->buildBundleFieldClass($name);
+			}
+			else{
 				$field = $this->buildFieldClass($name);
 			}
 			$jsGridFieldInstance = new $jsGridField['type']($name, $jsGridField['options'] ?? [], $field);
@@ -63,6 +69,8 @@ trait JsGridable {
 			$fields[$this->getKeyName()]->option('editing', false);
 		}
 
+		$fields = $this->afterJsGridFieldsBuilt($fields);
+
 		event(new JsGridFieldsBuilt($name, $fields));
 
 		return array_map(function($field){
@@ -70,19 +78,8 @@ trait JsGridable {
 		}, $fields);
 	}
 
-	/**
-     * Helper to build a field class from a field name
-     * 
-     * @param  string $name
-     * @return Field
-     */
-    public function buildFieldClass(string $name)
-    {
-        $fields = $this->fieldDefinitions();
-        if(!isset($fields[$name])){
-            throw FormFieldException::notDefinedInModel($name, get_class($this));
-        }
-        
-        return Field::buildFieldClass($name, $fields[$name]);
-    }
+	public function afterJsGridFieldsBuilt(array $fields)
+	{
+		return $fields;
+	}
 }
