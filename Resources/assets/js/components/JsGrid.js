@@ -5,7 +5,6 @@ import ModelSelectField from './fields/modelselect.js';
 import MediaField from './fields/media.js';
 import ArrayToString from './fields/arraytostring.js';
 import FileSizeField from './fields/filesize.js';
-import * as h from 'PinguHelpers';
 
 const JsGrid = (() => {
 
@@ -18,7 +17,7 @@ const JsGrid = (() => {
     function init()
     { 
         if(options.jsgrid.length) {
-            h.log('JsGrid initialized');
+            Helpers.log('JsGrid initialized');
             initFields();
             initJsGrid();
         }

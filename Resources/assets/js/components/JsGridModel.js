@@ -1,8 +1,6 @@
 import jsGrid from 'jsgrid';
 import jsGridBase from './JsGrid';
 
-import * as h from 'PinguHelpers';
-
 const JsGridModel = (() => {
 
     let options = {
@@ -69,7 +67,7 @@ const JsGridModel = (() => {
             loadData: function (filters) {
                 let d = $.Deferred();
                 filters = reorganizeFilters(filters);
-                h.get(jsOptions.ajaxIndexUri, filters)
+                Helpers.get(jsOptions.ajaxIndexUri, filters)
                 .done(
                     function (data) {
                         $('.jsgrid-total').html(data.total);
@@ -88,7 +86,7 @@ const JsGridModel = (() => {
                 let url = replaceUriToken(jsOptions.ajaxUpdateUri, item);
                 let d = $.Deferred();
                 item = removeNonEditableFields(item);
-                h.put(url,item)
+                Helpers.put(url,item)
                 .done(
                     function (data) {
                         d.resolve(data.model);
@@ -104,7 +102,7 @@ const JsGridModel = (() => {
             },
             deleteItem: function (item) {
                 let url = replaceUriToken(jsOptions.ajaxDeleteUri, item);
-                return h._delete(url)
+                return Helpers._delete(url)
                 .fail(
                     function (data) {
                         options.jsgrid.trigger('jsgrid-error', ['delete', data, item]);
