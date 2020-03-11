@@ -50,6 +50,9 @@ class JsGridServiceProvider extends ModuleServiceProvider
         $this->mergeConfigFrom(
             __DIR__.'/../Config/config.php', 'jsgrid'
         );
+        $this->publishes([
+            __DIR__.'/../Config/config.php' => config_path('jsgrid.php')
+        ], 'jsgrid-config');
     }
 
     public function registerAssets()
