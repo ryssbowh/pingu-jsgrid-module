@@ -17,7 +17,7 @@ const JsGrid = (() => {
     function init()
     { 
         if(options.jsgrid.length) {
-            Helpers.log('JsGrid initialized');
+            Logger.log('JsGrid initialized');
             initFields();
             initJsGrid();
         }
